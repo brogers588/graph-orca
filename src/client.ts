@@ -1,9 +1,20 @@
-import http from 'http';
+import fetch, { Response } from 'node-fetch';
 
 import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from './config';
-import { AcmeUser, AcmeGroup } from './types';
+import {
+  OrcaOrganizationUsersResponse,
+  OrcaGroupsResponse,
+  OrcaGroup,
+  OrcaGroupResponse,
+  OrcaRolesResponse,
+  OrcaRole,
+  OrcaUserWithRole,
+  OrcaUserSessionResponse,
+  OrcaAccessUsersResponse,
+  OrcaUser,
+} from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -16,40 +27,123 @@ export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
  * resources.
  */
 export class APIClient {
+  private static accessToken?: string;
+
   constructor(readonly config: IntegrationConfig) {}
 
-  public async verifyAuthentication(): Promise<void> {
-    // TODO make the most light-weight request possible to validate
-    // authentication works with the provided credentials, throw an err if
-    // authentication fails
-    const request = new Promise<void>((resolve, reject) => {
-      http.get(
-        {
-          hostname: 'localhost',
-          port: 443,
-          path: '/api/v1/some/endpoint?limit=1',
-          agent: false,
-          timeout: 10,
+  /**
+   * Authenticates with Orca Security API and stores access & refresh tokens.
+   */
+  private async authenticate(): Promise<void> {
+    const response = await fetch(
+      'https://api.orcasecurity.io/api/user/session',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        (res) => {
-          if (res.statusCode !== 200) {
-            reject(new Error('Provider authentication failed'));
-          } else {
-            resolve();
-          }
-        },
-      );
+        body: JSON.stringify({
+          security_token: this.config.clientSecret,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: new Error('Provider authentication failed'),
+        endpoint: 'https://api.orcasecurity.io/api/user/session',
+        status: response.status,
+        statusText: response.statusText,
+      });
+    }
+
+    const body: OrcaUserSessionResponse = await response.json();
+
+    APIClient.accessToken = body.jwt.access;
+  }
+
+  /**
+   * Attempts to fetch the provided url. Automatically authenticates if 401 is received, and retries immediately after.
+   *
+   * @param url the endpoint to query
+   * @param retries the current retry count
+   * @param maxRetries the max retries
+   * @returns
+   */
+  private async authenticateAndFetch(
+    url: string,
+    retries = 0,
+    maxRetries = 1,
+  ): Promise<Response> {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${APIClient.accessToken}`,
+      },
     });
 
-    try {
-      await request;
-    } catch (err) {
+    if (response.ok) {
+      return response;
+    } else if (response.status === 401 && retries < maxRetries) {
+      await this.authenticate();
+
+      return this.authenticateAndFetch(url, retries++, maxRetries);
+    } else {
+      throw new Error(
+        `GET request failed: url=${url}, status=${response.status}, statusText=${response.statusText}`,
+      );
+    }
+  }
+
+  /**
+   * Verifies authentication by making lightweight HEAD request to https://api.orcasecurity.io/api/auth/tokens.
+   */
+  public async verifyAuthentication(): Promise<void> {
+    if (!APIClient.accessToken) {
+      await this.authenticate();
+    }
+
+    const response = await fetch(
+      'https://api.orcasecurity.io/api/auth/tokens',
+      {
+        method: 'HEAD',
+        headers: {
+          Authorization: `Bearer ${APIClient.accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
       throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: 'https://localhost/api/v1/some/endpoint?limit=1',
-        status: err.status,
-        statusText: err.statusText,
+        cause: new Error('Provider authentication failed'),
+        endpoint: 'https://api.orcasecurity.io/api/auth/tokens',
+        status: response.status,
+        statusText: response.statusText,
       });
+    }
+  }
+
+  /**
+   * Makes a GET request to the provided relative endpoint at https://api.orcasecurity.io/api.
+   *
+   * @param endpoint the endpoint to query
+   * @returns the body of the request using the provided generic type
+   */
+  private async getRequest<T>(endpoint: string): Promise<T> {
+    const url = `https://api.orcasecurity.io/api${endpoint}`;
+
+    if (!APIClient.accessToken) {
+      await this.authenticate();
+    }
+
+    const response = await this.authenticateAndFetch(url, 0, 1);
+
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error(
+        `GET request failed: url=${url}, status=${response.status}, statusText=${response.statusText}`,
+      );
     }
   }
 
@@ -59,29 +153,39 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateUsers(
-    iteratee: ResourceIteratee<AcmeUser>,
+    iteratee: ResourceIteratee<OrcaUser>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    const response: OrcaOrganizationUsersResponse = await this.getRequest(
+      '/organization/users',
+    );
 
-    const users: AcmeUser[] = [
-      {
-        id: 'acme-user-1',
-        name: 'User One',
-      },
-      {
-        id: 'acme-user-2',
-        name: 'User Two',
-      },
-    ];
+    for (const user of response.data.users) {
+      await iteratee({
+        id: user.user_id,
+        email: user.email,
+        first_name: user.first,
+        last_name: user.last,
+      });
+    }
+  }
 
-    for (const user of users) {
-      await iteratee(user);
+  /**
+   * Iterates each rbac access user in the provider.
+   *
+   * @param iteratee receives each resource to produce relationships
+   */
+  async iterateAccessUsers(
+    iteratee: ResourceIteratee<OrcaUserWithRole>,
+  ): Promise<void> {
+    const response: OrcaAccessUsersResponse = await this.getRequest(
+      '/rbac/access/user',
+    );
+
+    for (const rbacUser of response.data) {
+      await iteratee({
+        user: rbacUser.user,
+        role: rbacUser.role,
+      });
     }
   }
 
@@ -91,30 +195,39 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateGroups(
-    iteratee: ResourceIteratee<AcmeGroup>,
+    iteratee: ResourceIteratee<OrcaGroup>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    const groupsResponse: OrcaGroupsResponse = await this.getRequest(
+      '/rbac/group',
+    );
 
-    const groups: AcmeGroup[] = [
-      {
-        id: 'acme-group-1',
-        name: 'Group One',
-        users: [
-          {
-            id: 'acme-user-1',
-          },
-        ],
-      },
-    ];
+    for (const group of groupsResponse.data.groups) {
+      const groupResponse: OrcaGroupResponse = await this.getRequest(
+        `/rbac/group/${group.id}`,
+      );
 
-    for (const group of groups) {
-      await iteratee(group);
+      await iteratee({
+        id: group.id,
+        name: group.name,
+        sso_group: group.sso_group,
+        description: group.description,
+        users: groupResponse.data.users,
+      });
+    }
+  }
+
+  /**
+   * Iterates each role resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateRoles(
+    iteratee: ResourceIteratee<OrcaRole>,
+  ): Promise<void> {
+    const response: OrcaRolesResponse = await this.getRequest('/rbac/role');
+
+    for (const role of response.data) {
+      await iteratee(role);
     }
   }
 }

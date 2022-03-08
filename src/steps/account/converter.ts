@@ -5,21 +5,25 @@ import {
 
 import { Entities } from '../constants';
 
-export function createAccountEntity(): Entity {
+function createAccountId(email: string): string {
+  return `orca-account-${email}`;
+}
+
+export function createAccountEntity(email: string): Entity {
+  const accountId = createAccountId(email);
+
   return createIntegrationEntity({
     entityData: {
       source: {
-        id: 'acme-unique-account-id',
-        name: 'Example Co. Acme Account',
+        id: accountId,
+        name: 'Orca Account',
       },
       assign: {
-        _key: 'acme-unique-account-id',
+        _key: accountId,
         _type: Entities.ACCOUNT._type,
         _class: Entities.ACCOUNT._class,
         mfaEnabled: true,
-        // This is a custom property that is not a part of the data model class
-        // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/Account.json
-        manager: 'Manager Name',
+        accessURL: 'https://app.orcasecurity.io',
       },
     },
   });
