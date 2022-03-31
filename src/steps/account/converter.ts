@@ -22,7 +22,7 @@ export function createAccountEntity(email: string): Entity {
         _key: accountId,
         _type: Entities.ACCOUNT._type,
         _class: Entities.ACCOUNT._class,
-        mfaEnabled: true,
+        mfaEnabled: false,
         accessURL: 'https://app.orcasecurity.io',
       },
     },
