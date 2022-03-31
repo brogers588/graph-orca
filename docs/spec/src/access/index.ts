@@ -4,7 +4,7 @@ import { IntegrationConfig } from '../../../../src/config';
 export const accessSpec: StepSpec<IntegrationConfig>[] = [
   {
     /**
-     * ENDPOINT: https://localhost/api/v1/users
+     * ENDPOINT: https://api.orcasecurity.io/api/organization/users
      * PATTERN: Fetch Entities
      */
     id: 'fetch-users',
@@ -12,16 +12,16 @@ export const accessSpec: StepSpec<IntegrationConfig>[] = [
     entities: [
       {
         resourceName: 'User',
-        _type: 'acme_user',
+        _type: 'orca_user',
         _class: ['User'],
       },
     ],
     relationships: [
       {
-        _type: 'acme_account_has_user',
-        sourceType: 'acme_account',
+        _type: 'orca_account_has_user',
+        sourceType: 'orca_account',
         _class: RelationshipClass.HAS,
-        targetType: 'acme_user',
+        targetType: 'orca_user',
       },
     ],
     dependsOn: ['fetch-account'],
@@ -29,7 +29,7 @@ export const accessSpec: StepSpec<IntegrationConfig>[] = [
   },
   {
     /**
-     * ENDPOINT: https://localhost/api/v1/groups
+     * ENDPOINT: https://api.orcasecurity.io/api/rbac/group
      * PATTERN: Fetch Entities
      */
     id: 'fetch-groups',
@@ -37,16 +37,41 @@ export const accessSpec: StepSpec<IntegrationConfig>[] = [
     entities: [
       {
         resourceName: 'UserGroup',
-        _type: 'acme_group',
+        _type: 'orca_group',
         _class: ['UserGroup'],
       },
     ],
     relationships: [
       {
-        _type: 'acme_account_has_group',
-        sourceType: 'acme_account',
+        _type: 'orca_account_has_group',
+        sourceType: 'orca_account',
         _class: RelationshipClass.HAS,
-        targetType: 'acme_group',
+        targetType: 'orca_group',
+      },
+    ],
+    dependsOn: ['fetch-account'],
+    implemented: true,
+  },
+  {
+    /**
+     * ENDPOINT: https://api.orcasecurity.io/api/rbac/role
+     * PATTERN: Fetch Roles
+     */
+    id: 'fetch-roles',
+    name: 'Fetch Roles',
+    entities: [
+      {
+        resourceName: 'Role',
+        _type: 'orca_role',
+        _class: ['AccessRole'],
+      },
+    ],
+    relationships: [
+      {
+        _type: 'orca_user_assigned_role',
+        sourceType: 'orca_user',
+        _class: RelationshipClass.ASSIGNED,
+        targetType: 'orca_role',
       },
     ],
     dependsOn: ['fetch-account'],
@@ -62,13 +87,32 @@ export const accessSpec: StepSpec<IntegrationConfig>[] = [
     entities: [],
     relationships: [
       {
-        _type: 'acme_group_has_user',
-        sourceType: 'acme_group',
+        _type: 'orca_group_has_user',
+        sourceType: 'orca_group',
         _class: RelationshipClass.HAS,
-        targetType: 'acme_user',
+        targetType: 'orca_user',
       },
     ],
     dependsOn: ['fetch-groups', 'fetch-users'],
+    implemented: true,
+  },
+  {
+    /**
+     * ENDPOINT: n/a
+     * PATTERN: Build Child Relationships
+     */
+    id: 'build-user-role-relationships',
+    name: 'Build User -> Role Relationships',
+    entities: [],
+    relationships: [
+      {
+        _type: 'orca_user_assigned_role',
+        sourceType: 'orca_user',
+        _class: RelationshipClass.ASSIGNED,
+        targetType: 'orca_role',
+      },
+    ],
+    dependsOn: ['fetch-users', 'fetch-roles'],
     implemented: true,
   },
 ];

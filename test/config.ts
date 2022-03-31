@@ -10,11 +10,11 @@ if (process.env.LOAD_ENV) {
     path: path.join(__dirname, '../.env'),
   });
 }
-const DEFAULT_CLIENT_ID = 'dummy-acme-client-id';
-const DEFAULT_CLIENT_SECRET = 'dummy-acme-client-secret';
+const DEFAULT_CLIENT_EMAIL = 'dummy-orca-client-email';
+const DEFAULT_CLIENT_SECRET = 'dummy-orca-client-secret';
 
 export const integrationConfig: IntegrationConfig = {
-  clientId: process.env.CLIENT_ID || DEFAULT_CLIENT_ID,
+  clientEmail: process.env.CLIENT_EMAIL || DEFAULT_CLIENT_EMAIL,
   clientSecret: process.env.CLIENT_SECRET || DEFAULT_CLIENT_SECRET,
 };
 

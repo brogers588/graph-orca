@@ -21,7 +21,7 @@ describe('#validateInvocation', () => {
     });
 
     await expect(validateInvocation(executionContext)).rejects.toThrow(
-      'Config requires all of {clientId, clientSecret}',
+      'Config requires all of {clientSecret, clientEmail}',
     );
   });
 
@@ -67,7 +67,7 @@ describe('#validateInvocation', () => {
 
         const executionContext = createMockExecutionContext({
           instanceConfig: {
-            clientId: 'INVALID',
+            clientEmail: 'INVALID',
             clientSecret: integrationConfig.clientSecret,
           },
         });
@@ -90,13 +90,13 @@ describe('#validateInvocation', () => {
 
         const executionContext = createMockExecutionContext({
           instanceConfig: {
-            clientId: integrationConfig.clientSecret,
+            clientEmail: integrationConfig.clientEmail,
             clientSecret: 'INVALID',
           },
         });
 
         await expect(validateInvocation(executionContext)).rejects.toThrow(
-          'Provider authentication failed at https://localhost/api/v1/some/endpoint?limit=1: 401 Unauthorized',
+          'Provider authentication failed at https://api.orcasecurity.io/api/auth/tokens: 401 Unauthorized',
         );
       });
     });

@@ -16,13 +16,19 @@ don't bother documenting that here.
 
 ## Provider account setup
 
-Please provide information about the steps needed to create an account with a
-provider. Images and references to a provider's documentation is very helpful
-for new developers picking up your work.
+1. Log in to [Orca dashboard](https://app.orcasecurity.io) and navigate to
+   [integrations](https://app.orcasecurity.io/integrations).
+2. Click the **Manage Keys** button to create a new Orca API token.
+3. Click "Generate A New Key" and make sure to supply it as the ENV variable
+   (CLIENT_SECRET=[token you've just generated]).
+4. Next, you also need to supply the account email as the ENV variable
+   (CLIENT_EMAIL=[the email you've used for authenticating]).
 
 ## Authentication
 
-Supply details here for information on how to authenticate with a provider so
-that developers have an idea of what's needed to hit APIs. It may be useful to
-provide explanations for each value specified in the
-[`IntegrationInstanceConfigFieldMap`](../src/config.ts).
+Copy the `.env.example` to `.env` file and fill in the variables using the user
+information and API token information generated from instructions above. The
+mapping is as follows:
+
+- CLIENT_SECRET= ${`accessToken`}
+- CLIENT_EMAIL= ${`userEmail`}
