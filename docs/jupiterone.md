@@ -33,6 +33,10 @@ If you need help with this integration, please contact
 1. Log in to [Orca dashboard](https://app.orcasecurity.io) and navigate to
    [integrations](https://app.orcasecurity.io/integrations).
 2. Click the **Manage Keys** button to create a new Orca API token.
+3. Click "Generate A New Key" and make sure to supply it as the ENV variable
+   (CLIENT_SECRET=[token you've just generated]).
+4. Next, you also need to supply the account email as the ENV variable
+   (CLIENT_EMAIL=[the email you've used for authenticating]).
 
 ### In JupiterOne
 
@@ -80,6 +84,7 @@ The following entities are created:
 | Resources | Entity `_type` | Entity `_class` |
 | --------- | -------------- | --------------- |
 | Account   | `orca_account` | `Account`       |
+| Role      | `orca_role`    | `AccessRole`    |
 | User      | `orca_user`    | `User`          |
 | UserGroup | `orca_group`   | `UserGroup`     |
 
@@ -92,6 +97,7 @@ The following relationships are created:
 | `orca_account`        | **HAS**               | `orca_group`          |
 | `orca_account`        | **HAS**               | `orca_user`           |
 | `orca_group`          | **HAS**               | `orca_user`           |
+| `orca_user`           | **ASSIGNED**          | `orca_role`           |
 
 <!--
 ********************************************************************************
