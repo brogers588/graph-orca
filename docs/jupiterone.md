@@ -1,4 +1,4 @@
-# Integration with JupiterOne
+# Orca Integration with JupiterOne
 
 ## Orca Security + JupiterOne Integration Benefits
 
