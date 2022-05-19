@@ -21,7 +21,7 @@ describe('#validateInvocation', () => {
     });
 
     await expect(validateInvocation(executionContext)).rejects.toThrow(
-      'Config requires all of {clientSecret, clientEmail}',
+      'Config requires all of {clientSecret, clientEmail, clientBaseUrl}',
     );
   });
 
@@ -69,6 +69,7 @@ describe('#validateInvocation', () => {
           instanceConfig: {
             clientEmail: 'INVALID',
             clientSecret: integrationConfig.clientSecret,
+            clientBaseUrl: integrationConfig.clientBaseUrl,
           },
         });
 
@@ -92,6 +93,7 @@ describe('#validateInvocation', () => {
           instanceConfig: {
             clientEmail: integrationConfig.clientEmail,
             clientSecret: 'INVALID',
+            clientBaseUrl: integrationConfig.clientBaseUrl,
           },
         });
 

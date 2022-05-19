@@ -23,6 +23,35 @@ export interface OrcaUserWithRole {
   role: OrcaRole;
 }
 
+export interface OrcaAsset {
+  asset_unique_id: string;
+  asset_name: string;
+}
+
+export interface OrcaCVE {
+  cve_id: string;
+  asset_unique_id: string;
+  type: string;
+  score: number;
+  context: string;
+  nvd: {
+    cvss2_severity: string;
+    cvss2_score: number;
+    cvss3_severity: string;
+    cvss3_vector: string;
+    cvss3_score: number;
+    cvss2_vector: string;
+  };
+  vendor_source_link: string;
+  level: number;
+  fix_available_state: 'Yes' | 'No';
+  published: string;
+  labels: string[];
+  asset_type: string;
+  summary: string;
+  severity: string;
+}
+
 // /api/organization/users
 export interface OrcaOrganizationUsersResponse {
   status: string;
@@ -83,4 +112,16 @@ export interface OrcaUserSessionResponse {
     refresh: string;
     access: string;
   };
+}
+
+// /api/assets
+export interface OrcaAssetsResponse {
+  status: string;
+  data: OrcaAsset[];
+}
+
+// /api/cve
+export interface OrcaCVEsResponse {
+  status: string;
+  data: OrcaCVE[];
 }

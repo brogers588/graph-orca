@@ -28,6 +28,9 @@ export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
     type: 'string',
     mask: true,
   },
+  clientBaseUrl: {
+    type: 'string',
+  },
 };
 
 /**
@@ -44,6 +47,11 @@ export interface IntegrationConfig extends IntegrationInstanceConfig {
    * The client email at the provider.
    */
   clientEmail: string;
+
+  /**
+   * The client base url at the provider.
+   */
+  clientBaseUrl: string;
 }
 
 export async function validateInvocation(
@@ -51,9 +59,9 @@ export async function validateInvocation(
 ) {
   const { config } = context.instance;
 
-  if (!config.clientSecret || !config.clientEmail) {
+  if (!config.clientSecret || !config.clientEmail || !config.clientBaseUrl) {
     throw new IntegrationValidationError(
-      'Config requires all of {clientSecret, clientEmail}',
+      'Config requires all of {clientSecret, clientEmail, clientBaseUrl}',
     );
   }
 
