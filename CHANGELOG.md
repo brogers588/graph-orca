@@ -8,6 +8,25 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added support for ingesting the following **new** resources:
+
+  | Resource | Type           | Class      |
+  | -------- | -------------- | ---------- |
+  | Asset    | `orca_asset`   | `Resource` |
+  | Finding  | `orca_finding` | `Finding`  |
+
+- Added support for ingesting the following **new** relationships:
+
+  | Source         | class   | Target         |
+  | -------------- | ------- | -------------- |
+  | `orca_account` | **HAS** | `orca_asset`   |
+  | `orca_account` | **HAS** | `orca_finding` |
+  | `orca_asset`   | **HAS** | `orca_finding` |
+  | `orca_finding` | **HAS** | `cve`          |
+  | `orca_finding` | **IS**  | `cve`          |
+
 ## 1.0.0 - 2022-03-31
 
 ### Added

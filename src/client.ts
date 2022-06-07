@@ -14,6 +14,10 @@ import {
   OrcaUserSessionResponse,
   OrcaAccessUsersResponse,
   OrcaUser,
+  OrcaAsset,
+  OrcaAssetsResponse,
+  OrcaCVE,
+  OrcaCVEsResponse,
 } from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
@@ -36,7 +40,7 @@ export class APIClient {
    */
   private async authenticate(): Promise<void> {
     const response = await fetch(
-      'https://api.orcasecurity.io/api/user/session',
+      `${this.config.clientBaseUrl}/api/user/session`,
       {
         method: 'POST',
         headers: {
@@ -51,7 +55,7 @@ export class APIClient {
     if (!response.ok) {
       throw new IntegrationProviderAuthenticationError({
         cause: new Error('Provider authentication failed'),
-        endpoint: 'https://api.orcasecurity.io/api/user/session',
+        endpoint: `${this.config.clientBaseUrl}/api/user/session`,
         status: response.status,
         statusText: response.statusText,
       });
@@ -104,7 +108,7 @@ export class APIClient {
     }
 
     const response = await fetch(
-      'https://api.orcasecurity.io/api/auth/tokens',
+      `${this.config.clientBaseUrl}/api/auth/tokens`,
       {
         method: 'HEAD',
         headers: {
@@ -116,7 +120,7 @@ export class APIClient {
     if (!response.ok) {
       throw new IntegrationProviderAuthenticationError({
         cause: new Error('Provider authentication failed'),
-        endpoint: 'https://api.orcasecurity.io/api/auth/tokens',
+        endpoint: `${this.config.clientBaseUrl}/api/auth/tokens`,
         status: response.status,
         statusText: response.statusText,
       });
@@ -130,7 +134,7 @@ export class APIClient {
    * @returns the body of the request using the provided generic type
    */
   private async getRequest<T>(endpoint: string): Promise<T> {
-    const url = `https://api.orcasecurity.io/api${endpoint}`;
+    const url = `${this.config.clientBaseUrl}/api${endpoint}`;
 
     if (!APIClient.accessToken) {
       await this.authenticate();
@@ -228,6 +232,34 @@ export class APIClient {
 
     for (const role of response.data) {
       await iteratee(role);
+    }
+  }
+
+  /**
+   * Iterates each asset resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateAssets(
+    iteratee: ResourceIteratee<OrcaAsset>,
+  ): Promise<void> {
+    const response: OrcaAssetsResponse = await this.getRequest('/assets');
+
+    for (const asset of response.data) {
+      await iteratee(asset);
+    }
+  }
+
+  /**
+   * Iterates each cve resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
+    const response: OrcaCVEsResponse = await this.getRequest('/cves');
+
+    for (const cve of response.data) {
+      await iteratee(cve);
     }
   }
 }
