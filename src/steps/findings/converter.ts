@@ -91,7 +91,7 @@ export function createFindingCveRelationship(
       skipTargetCreation: false,
       targetFilterKeys: [['_type', '_key']],
       targetEntity: {
-        _key: cve.cve_id,
+        _key: cve.cve_id.toLowerCase(),
         _type: 'cve',
         id: cve.cve_id,
         score: score ?? cve.score,

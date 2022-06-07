@@ -18,6 +18,7 @@ export function createAssetEntity(asset: OrcaAsset): Entity {
         _class: Entities.ASSET._class,
         _key: asset.asset_unique_id,
         name: asset.asset_name,
+        id: asset.asset_unique_id,
       },
     },
   });
