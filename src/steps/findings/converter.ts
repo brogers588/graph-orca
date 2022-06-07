@@ -47,7 +47,7 @@ export function createFindingEntity(cve: OrcaCVE): Entity {
         references: cve.vendor_source_link
           ? [cve.vendor_source_link]
           : undefined,
-        isFixAvailable: fixAvailable === true,
+        fixable: fixAvailable === true,
       },
     },
   });
@@ -77,8 +77,11 @@ export function createAccountFindingRelationship(
 
 export function createFindingCveRelationship(
   finding: Entity,
-  cveId: string,
+  cve: OrcaCVE,
 ): Relationship {
+  const { score, vector } = extractCVSS(cve);
+  const cveIdDisplay = cve.cve_id.toUpperCase();
+
   return createMappedRelationship({
     _class: RelationshipClass.IS,
     _type: 'orca_finding_is_cve',
@@ -88,10 +91,16 @@ export function createFindingCveRelationship(
       skipTargetCreation: false,
       targetFilterKeys: [['_type', '_key']],
       targetEntity: {
-        _key: cveId,
+        _key: cve.cve_id,
         _type: 'cve',
-        id: cveId,
-        webLink: `https://nvd.nist.gov/vuln/detail/${cveId}`,
+        id: cve.cve_id,
+        score: score ?? cve.score,
+        vector,
+        name: cveIdDisplay,
+        displayName: cveIdDisplay,
+        severity: cve.severity,
+        references: [`https://nvd.nist.gov/vuln/detail/${cve.cve_id}`],
+        webLink: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
       },
     },
   });

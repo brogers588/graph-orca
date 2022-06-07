@@ -34,7 +34,7 @@ export async function fetchCVEs({
       // Account -HAS-> Finding
       createAccountFindingRelationship(accountEntity, findingEntity),
       // Finding -IS-> CVE (mapped)
-      createFindingCveRelationship(findingEntity, cve.cve_id.toLowerCase()),
+      createFindingCveRelationship(findingEntity, cve),
     ]);
 
     const assetEntity = await jobState.findEntity(cve.asset_unique_id);
