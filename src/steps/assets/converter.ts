@@ -12,7 +12,7 @@ import { OrcaAsset } from '../../types';
 export function createAssetEntity(asset: OrcaAsset): Entity {
   return createIntegrationEntity({
     entityData: {
-      source: asset,
+      source: {},
       assign: {
         _type: Entities.ASSET._type,
         _class: Entities.ASSET._class,
