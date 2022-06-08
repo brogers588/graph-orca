@@ -1,6 +1,6 @@
 {
   "name": "@jupiterone/graph-orca",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A JupiterOne Integration for ingesting data for the Orca",
   "license": "MPL-2.0",
   "main": "src/index.js",
@@ -30,12 +30,12 @@
     "prepush": "yarn format:check && yarn lint && yarn type-check && jest --changedSince main"
   },
   "peerDependencies": {
-    "@jupiterone/integration-sdk-core": "^8.4.1"
+    "@jupiterone/integration-sdk-core": "^8.13.11"
   },
   "devDependencies": {
-    "@jupiterone/integration-sdk-core": "^8.4.1",
-    "@jupiterone/integration-sdk-dev-tools": "^8.4.1",
-    "@jupiterone/integration-sdk-testing": "^8.4.1",
+    "@jupiterone/integration-sdk-core": "^8.13.11",
+    "@jupiterone/integration-sdk-dev-tools": "^8.13.11",
+    "@jupiterone/integration-sdk-testing": "^8.13.11",
     "@types/node-fetch": "2.6.1"
   },
   "dependencies": {
