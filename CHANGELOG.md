@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.1.1 - 2022-07-08
+
+### Fixed
+
+- Rename `assets` folder to `asset` to work around a bundling issue
+
 ## 1.1.0 - 2022-07-07
 
 ### Added

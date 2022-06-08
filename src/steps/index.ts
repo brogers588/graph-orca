@@ -1,6 +1,6 @@
 import { accountSteps } from './account';
 import { accessSteps } from './access';
-import { assetSteps } from './assets';
+import { assetSteps } from './asset';
 import { findingSteps } from './findings';
 
 const integrationSteps = [
