@@ -1,6 +1,9 @@
 import fetch, { Response } from 'node-fetch';
 
-import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
+import {
+  IntegrationProviderAPIError,
+  IntegrationProviderAuthenticationError,
+} from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from './config';
 import {
@@ -15,9 +18,8 @@ import {
   OrcaAccessUsersResponse,
   OrcaUser,
   OrcaAsset,
-  OrcaAssetsResponse,
   OrcaCVE,
-  OrcaCVEsResponse,
+  OrcaResponse,
 } from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
@@ -72,18 +74,24 @@ export class APIClient {
    * @param url the endpoint to query
    * @param retries the current retry count
    * @param maxRetries the max retries
+   * @param method the method of the query
+   * @param body the body of the query
    * @returns
    */
   private async authenticateAndFetch(
     url: string,
     retries = 0,
     maxRetries = 1,
+    method: 'GET' | 'POST' = 'GET',
+    body?: any,
   ): Promise<Response> {
     const response = await fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${APIClient.accessToken}`,
       },
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     if (response.ok) {
@@ -131,16 +139,21 @@ export class APIClient {
    * Makes a GET request to the provided relative endpoint at https://api.orcasecurity.io/api.
    *
    * @param endpoint the endpoint to query
+   * @param method the method of the query
    * @returns the body of the request using the provided generic type
    */
-  private async getRequest<T>(endpoint: string): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    method: 'GET' | 'POST' = 'GET',
+    body?: any,
+  ): Promise<T> {
     const url = `${this.config.clientBaseUrl}/api${endpoint}`;
 
     if (!APIClient.accessToken) {
       await this.authenticate();
     }
 
-    const response = await this.authenticateAndFetch(url, 0, 1);
+    const response = await this.authenticateAndFetch(url, 0, 1, method, body);
 
     if (response.ok) {
       return response.json();
@@ -152,6 +165,44 @@ export class APIClient {
   }
 
   /**
+   * Makes a paginated request to the provided relative endpoint.
+   *
+   * @param uri the endpoint to query
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  private async paginatedQuery<T>(
+    uri: string,
+    iteratee: ResourceIteratee<T>,
+  ): Promise<void> {
+    try {
+      const limit = 100;
+      let page = 1;
+      let proceed = true;
+
+      do {
+        const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
+          grouping: true,
+          start_at_index: (page - 1) * limit,
+          limit,
+        });
+
+        for (const item of response.data) {
+          await iteratee(item);
+        }
+
+        proceed = ++page * limit < response.total_items;
+      } while (proceed);
+    } catch (err) {
+      throw new IntegrationProviderAPIError({
+        cause: new Error(err.message),
+        endpoint: uri,
+        status: err.statusCode,
+        statusText: err.message,
+      });
+    }
+  }
+
+  /**
    * Iterates each user resource in the provider.
    *
    * @param iteratee receives each resource to produce entities/relationships
@@ -159,7 +210,7 @@ export class APIClient {
   public async iterateUsers(
     iteratee: ResourceIteratee<OrcaUser>,
   ): Promise<void> {
-    const response: OrcaOrganizationUsersResponse = await this.getRequest(
+    const response: OrcaOrganizationUsersResponse = await this.request(
       '/organization/users',
     );
 
@@ -181,7 +232,7 @@ export class APIClient {
   async iterateAccessUsers(
     iteratee: ResourceIteratee<OrcaUserWithRole>,
   ): Promise<void> {
-    const response: OrcaAccessUsersResponse = await this.getRequest(
+    const response: OrcaAccessUsersResponse = await this.request(
       '/rbac/access/user',
     );
 
@@ -201,12 +252,12 @@ export class APIClient {
   public async iterateGroups(
     iteratee: ResourceIteratee<OrcaGroup>,
   ): Promise<void> {
-    const groupsResponse: OrcaGroupsResponse = await this.getRequest(
+    const groupsResponse: OrcaGroupsResponse = await this.request(
       '/rbac/group',
     );
 
     for (const group of groupsResponse.data.groups) {
-      const groupResponse: OrcaGroupResponse = await this.getRequest(
+      const groupResponse: OrcaGroupResponse = await this.request(
         `/rbac/group/${group.id}`,
       );
 
@@ -228,7 +279,7 @@ export class APIClient {
   public async iterateRoles(
     iteratee: ResourceIteratee<OrcaRole>,
   ): Promise<void> {
-    const response: OrcaRolesResponse = await this.getRequest('/rbac/role');
+    const response: OrcaRolesResponse = await this.request('/rbac/role');
 
     for (const role of response.data) {
       await iteratee(role);
@@ -243,11 +294,7 @@ export class APIClient {
   public async iterateAssets(
     iteratee: ResourceIteratee<OrcaAsset>,
   ): Promise<void> {
-    const response: OrcaAssetsResponse = await this.getRequest('/assets');
-
-    for (const asset of response.data) {
-      await iteratee(asset);
-    }
+    await this.paginatedQuery('/query/assets', iteratee);
   }
 
   /**
@@ -256,11 +303,7 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
-    const response: OrcaCVEsResponse = await this.getRequest('/cves');
-
-    for (const cve of response.data) {
-      await iteratee(cve);
-    }
+    await this.paginatedQuery('/query/cves', iteratee);
   }
 }
 

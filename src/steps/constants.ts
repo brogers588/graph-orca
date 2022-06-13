@@ -114,7 +114,7 @@ export const MappedRelationships: Record<
   FINDING_IS_CVE: {
     _type: 'orca_finding_is_cve',
     sourceType: Entities.FINDING._type,
-    _class: RelationshipClass.HAS,
+    _class: RelationshipClass.IS,
     targetType: Entities.CVE._type,
     direction: RelationshipDirection.FORWARD,
   },

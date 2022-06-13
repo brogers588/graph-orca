@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added support for pagination for /cves and /assets endpoints
+
 ## 1.1.1 - 2022-07-08
 
 ### Fixed
