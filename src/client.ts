@@ -94,17 +94,13 @@ export class APIClient {
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    if (response.ok) {
-      return response;
-    } else if (response.status === 401 && retries < maxRetries) {
+    if (response.status === 401 && retries < maxRetries) {
       await this.authenticate();
 
       return this.authenticateAndFetch(url, retries++, maxRetries);
-    } else {
-      throw new Error(
-        `GET request failed: url=${url}, status=${response.status}, statusText=${response.statusText}`,
-      );
     }
+
+    return response;
   }
 
   /**
@@ -140,6 +136,7 @@ export class APIClient {
    *
    * @param endpoint the endpoint to query
    * @param method the method of the query
+   * @param body the body of the query
    * @returns the body of the request using the provided generic type
    */
   private async request<T>(
@@ -158,9 +155,11 @@ export class APIClient {
     if (response.ok) {
       return response.json();
     } else {
-      throw new Error(
-        `GET request failed: url=${url}, status=${response.status}, statusText=${response.statusText}`,
-      );
+      throw new IntegrationProviderAPIError({
+        endpoint: url,
+        status: response.status,
+        statusText: response.statusText,
+      });
     }
   }
 
@@ -174,32 +173,23 @@ export class APIClient {
     uri: string,
     iteratee: ResourceIteratee<T>,
   ): Promise<void> {
-    try {
-      const limit = 100;
-      let page = 1;
-      let proceed = true;
+    const LIMIT = 100;
+    let page = 1;
+    let proceed = true;
 
-      do {
-        const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
-          grouping: true,
-          start_at_index: (page - 1) * limit,
-          limit,
-        });
-
-        for (const item of response.data) {
-          await iteratee(item);
-        }
-
-        proceed = ++page * limit < response.total_items;
-      } while (proceed);
-    } catch (err) {
-      throw new IntegrationProviderAPIError({
-        cause: new Error(err.message),
-        endpoint: uri,
-        status: err.statusCode,
-        statusText: err.message,
+    do {
+      const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
+        grouping: true,
+        start_at_index: (page - 1) * LIMIT,
+        limit: LIMIT,
       });
-    }
+
+      for (const item of response.data) {
+        await iteratee(item);
+      }
+
+      proceed = ++page * LIMIT < response.total_items;
+    } while (proceed);
   }
 
   /**
