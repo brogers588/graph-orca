@@ -7,14 +7,24 @@ import {
 
 export { Recording };
 
+function isRecordingEnabled(): boolean {
+  return Boolean(process.env.LOAD_ENV);
+}
+
 export function setupProjectRecording(
   input: Omit<SetupRecordingInput, 'mutateEntry'>,
 ): Recording {
+  const recordingEnabled = isRecordingEnabled();
+
   return setupRecording({
     ...input,
     redactedRequestHeaders: ['Authorization'],
     redactedResponseHeaders: ['set-cookie'],
     mutateEntry: (entry) => redact(entry),
+    options: {
+      mode: recordingEnabled ? 'record' : 'replay',
+      ...input.options,
+    },
   });
 }
 

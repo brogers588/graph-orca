@@ -101,7 +101,7 @@ The following relationships are created:
 | `orca_account`        | **HAS**               | `orca_group`          |
 | `orca_account`        | **HAS**               | `orca_user`           |
 | `orca_asset`          | **HAS**               | `orca_finding`        |
-| `orca_finding`        | **HAS**               | `cve`                 |
+| `orca_finding`        | **IS**                | `cve`                 |
 | `orca_group`          | **HAS**               | `orca_user`           |
 | `orca_user`           | **ASSIGNED**          | `orca_role`           |
 
