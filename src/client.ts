@@ -174,13 +174,13 @@ export class APIClient {
     iteratee: ResourceIteratee<T>,
   ): Promise<void> {
     const LIMIT = 100;
-    let page = 1;
+    let page = 0;
     let proceed = true;
 
     do {
       const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
         grouping: true,
-        start_at_index: (page - 1) * LIMIT,
+        start_at_index: page * LIMIT,
         limit: LIMIT,
       });
 
@@ -188,7 +188,8 @@ export class APIClient {
         await iteratee(item);
       }
 
-      proceed = ++page * LIMIT < response.total_items;
+      page++;
+      proceed = response.total_items > page * LIMIT;
     } while (proceed);
   }
 
