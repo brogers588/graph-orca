@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.0 - 2022-06-17
+
+### Changed
+
+- Changed relationship
+
+| Source         | class          | Target |
+| -------------- | -------------- | ------ |
+| `orca_finding` | ~~HAS~~ **IS** | `cve`  |
+
 ### Added
 
 - Added support for pagination for /cves and /assets endpoints
