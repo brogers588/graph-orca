@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fetch-findings 1`] = `
+Array [
+  "orca_account",
+  "orca_asset",
+  "orca_account_has_asset",
+  "orca_finding",
+  "orca_account_has_finding",
+  "orca_finding_is_cve",
+  "orca_asset_has_finding",
+]
+`;

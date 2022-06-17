@@ -52,6 +52,17 @@ export interface OrcaCVE {
   severity: string;
 }
 
+export interface OrcaResponse<T> {
+  status: string;
+  version: string;
+  total_items: number;
+  total_ungrouped_items: number;
+  data_grouped: boolean;
+  total_supported_items: number;
+  next_page_token?: string;
+  data: T;
+}
+
 // /api/organization/users
 export interface OrcaOrganizationUsersResponse {
   status: string;
