@@ -16,6 +16,11 @@ afterEach(async () => {
 
 jest.setTimeout(300000);
 
+/**
+ * Note: if attempting to re-record, the data set is very large.
+ * Modify the pagination function in the client to set
+ *       response.total_items = 125;
+ */
 test('fetch-findings', async () => {
   recording = setupProjectRecording({
     directory: __dirname,

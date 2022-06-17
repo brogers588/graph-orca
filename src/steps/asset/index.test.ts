@@ -12,9 +12,8 @@ afterEach(async () => {
 test('fetch-assets', async () => {
   /**
    * Note: if attempting to re-record, the data set is very large.
-   * Consider modifying the client to limit pagination and
-   * update the response `total_items` value in recording.har to
-   * a smaller value e.g. 200.
+   * Modify the pagination function in the client to set
+   *       response.total_items = 125;
    */
   recording = setupProjectRecording({
     directory: __dirname,
