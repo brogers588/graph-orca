@@ -14,6 +14,8 @@ afterEach(async () => {
   await recording.stop();
 });
 
+jest.setTimeout(300000);
+
 test('fetch-findings', async () => {
   recording = setupProjectRecording({
     directory: __dirname,
