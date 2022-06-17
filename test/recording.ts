@@ -53,5 +53,23 @@ function redact(entry): void {
     }
   }
 
+  if (parsedResponseText.next_page_token) {
+    parsedResponseText.next_page_token = ['REDACTED'];
+  }
+
+  // To prevent an excess of data (with possible gitleak errors),
+  // trim down to only the data currently used.
+  if (
+    Array.isArray(parsedResponseText.data) &&
+    entry.request.url.includes('/query/assets')
+  ) {
+    for (let i = 0; i < parsedResponseText.data.length; i++) {
+      parsedResponseText.data[i] = {
+        asset_unique_id: parsedResponseText.data[i].asset_unique_id,
+        asset_name: parsedResponseText.data[i].asset_name,
+      };
+    }
+  }
+
   entry.response.content.text = JSON.stringify(parsedResponseText);
 }
