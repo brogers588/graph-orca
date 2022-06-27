@@ -4,7 +4,7 @@ integrationDefinitionId: '${integration_definition_id}'
 questions: 
   - id: managed-question-orca-open-cve-findings
     title: Which Orca CVE findings are open?
-    description: Returns all Orca findings that have open CVEs.
+    description: Returns all Orca open findings CVEs.
     queries:
       query: |
         FIND orca_finding WITH open = true AS f
