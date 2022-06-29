@@ -6,11 +6,11 @@ questions:
     title: Which Orca CVE findings are open?
     description: Returns all Orca open findings CVEs.
     queries:
-      query: |
-        FIND orca_finding WITH open = true AS f
-        RETURN
-          f.category AS 'Finding Category', 
-          count(f) AS 'Findings'
+      - query: |
+          FIND orca_finding WITH open = true AS f
+          RETURN
+            f.category AS 'Finding Category', 
+            count(f) AS 'Findings'
     tags:
-  - orca
-  - vul
+      - orca
+      - vul
