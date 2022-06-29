@@ -1,15 +1,16 @@
 ---
-sourceId: managed:template
+sourceId: managed:orca
 integrationDefinitionId: '${integration_definition_id}'
-questions: []
-  # - id: integration-question-template-replace-me
-  #   title: What kinds of questions will this integration support?
-  #   description:
-  #     TODO Every integration should contribute questions! Please be carefule
-  #     to replace this before deploying the integration to JupiterOne.
-  #   queries:
-  #     - name: good
-  #       query: |
-  #         find * with _integrationDefinitionId = '${integration_definition_id}'
-  #   tags:
-  #     - template
+questions: 
+  - id: managed-question-orca-open-cve-findings
+    title: Which Orca CVE findings are open?
+    description: Returns all Orca open findings CVEs.
+    queries:
+      - query: |
+          FIND orca_finding WITH open = true AS f
+          RETURN
+            f.category AS 'Finding Category', 
+            count(f) AS 'Findings'
+    tags:
+      - orca
+      - vul
