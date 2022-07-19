@@ -23,6 +23,19 @@ export interface OrcaUserWithRole {
   role: OrcaRole;
 }
 
+export interface OrcaAsyncDownloadResponse {
+  method: 'async';
+  request_token: string;
+  version: string;
+  status: string;
+}
+
+export interface OrcaAsyncDownloadStatusResponse {
+  status: string;
+  query_status: string;
+  file_location?: string;
+}
+
 export interface OrcaAsset {
   asset_unique_id: string;
   asset_name: string;

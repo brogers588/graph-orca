@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch';
 
 import {
+  IntegrationError,
   IntegrationLogger,
   IntegrationProviderAPIError,
   IntegrationProviderAuthenticationError,
@@ -21,9 +22,19 @@ import {
   OrcaAsset,
   OrcaCVE,
   OrcaResponse,
+  OrcaAsyncDownloadResponse,
+  OrcaAsyncDownloadStatusResponse,
 } from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
+
+async function sleep(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
 
 /**
  * An APIClient maintains authentication state and provides an interface to
@@ -299,6 +310,71 @@ export class APIClient {
     }
   }
 
+  async waitForAssetDownloadUrl(requestToken: string): Promise<string> {
+    let assetUrl: string | undefined;
+    let totalSleepTimeMs = 0;
+
+    let totalIterations = 0;
+    const sleepTimeMs = 5000; // 5 seconds
+    const maxSleepTimeMs = 900000; // 15mins
+
+    do {
+      await sleep(sleepTimeMs);
+      totalSleepTimeMs += sleepTimeMs;
+
+      const statusResponse =
+        await this.request<OrcaAsyncDownloadStatusResponse>(
+          `/query/status/?request_token=${requestToken}`,
+          'GET',
+        );
+
+      totalIterations++;
+
+      if (totalIterations % 10 === 0) {
+        this.logger.info(
+          {
+            totalIterations,
+            totalSleepTimeMs,
+          },
+          'Total query status checks',
+        );
+      }
+
+      if (statusResponse.status !== 'success') {
+        this.logger.warn(
+          {
+            statusResponse: {
+              ...statusResponse,
+              file_location: !!statusResponse.file_location,
+            },
+          },
+          'Failed to fetch asset query status',
+        );
+
+        throw new IntegrationProviderAPIError({
+          endpoint: '/query/status',
+          status: 200,
+          statusText: 'Failed to fetch asset query status',
+          message: 'Failed to fetch asset query status',
+        });
+      }
+
+      if (totalSleepTimeMs >= maxSleepTimeMs) {
+        throw new IntegrationError({
+          code: 'ASSET_DOWNLOAD_TIMEOUT',
+          message: `Maximum time reached when attempting to export Orca assets (timeElapsed=${maxSleepTimeMs}ms)`,
+          fatal: false,
+        });
+      }
+
+      if (statusResponse.file_location) {
+        assetUrl = statusResponse.file_location;
+      }
+    } while (!assetUrl);
+
+    return assetUrl;
+  }
+
   /**
    * Iterates each asset resource in the provider.
    *
@@ -307,7 +383,32 @@ export class APIClient {
   public async iterateAssets(
     iteratee: ResourceIteratee<OrcaAsset>,
   ): Promise<void> {
-    await this.paginatedQuery('/query/assets', iteratee);
+    const response = await this.request<OrcaAsyncDownloadResponse>(
+      '/query/assets',
+      'POST',
+      {
+        download_async: true,
+        get_download_link: true,
+      },
+    );
+
+    const downloadUrl = await this.waitForAssetDownloadUrl(
+      response.request_token,
+    );
+
+    const exportAssetDownloadResponse = await fetch(downloadUrl);
+    const exportedAssets = await exportAssetDownloadResponse.json();
+
+    this.logger.info(
+      {
+        exportedAssets: exportedAssets.length,
+      },
+      'Succesfully exported assets',
+    );
+
+    for (const asset of exportedAssets) {
+      await iteratee(asset);
+    }
   }
 
   /**
