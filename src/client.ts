@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch';
 
 import {
+  IntegrationLogger,
   IntegrationProviderAPIError,
   IntegrationProviderAuthenticationError,
 } from '@jupiterone/integration-sdk-core';
@@ -35,7 +36,10 @@ export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 export class APIClient {
   private static accessToken?: string;
 
-  constructor(readonly config: IntegrationConfig) {}
+  constructor(
+    readonly config: IntegrationConfig,
+    readonly logger: IntegrationLogger,
+  ) {}
 
   /**
    * Authenticates with Orca Security API and stores access & refresh tokens.
@@ -155,6 +159,24 @@ export class APIClient {
     if (response.ok) {
       return response.json();
     } else {
+      try {
+        // Orca includes additional information upon request failures.
+        // Example:
+        //
+        // { status: 'failure', error: 'invalid limit 1000000' }
+        this.logger.warn(
+          {
+            result: await response.json(),
+            endpoint: url,
+            status: response.status,
+            statusText: response.statusText,
+          },
+          'Error making request',
+        );
+      } catch (err) {
+        // Could not parse the JSON body. Skip.
+      }
+
       throw new IntegrationProviderAPIError({
         endpoint: url,
         status: response.status,
@@ -298,6 +320,9 @@ export class APIClient {
   }
 }
 
-export function createAPIClient(config: IntegrationConfig): APIClient {
-  return new APIClient(config);
+export function createAPIClient(
+  config: IntegrationConfig,
+  logger: IntegrationLogger,
+): APIClient {
+  return new APIClient(config, logger);
 }
