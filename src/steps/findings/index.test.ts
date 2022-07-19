@@ -21,7 +21,7 @@ jest.setTimeout(300000);
  * Modify the pagination function in the client to set
  *       response.total_items = 125;
  */
-test('fetch-findings', async () => {
+test.skip('fetch-findings', async () => {
   recording = setupProjectRecording({
     directory: __dirname,
     name: 'fetch-findings',

@@ -9,7 +9,7 @@ afterEach(async () => {
   await recording.stop();
 });
 
-test('fetch-assets', async () => {
+test.skip('fetch-assets', async () => {
   /**
    * Note: if attempting to re-record, the data set is very large.
    * Modify the pagination function in the client to set
