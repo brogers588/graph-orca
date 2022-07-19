@@ -21,10 +21,11 @@ import {
 } from './converter';
 
 export async function fetchCVEs({
+  logger,
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
   await apiClient.iterateCVEs(async (cve) => {

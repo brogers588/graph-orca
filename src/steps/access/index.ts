@@ -22,10 +22,11 @@ import {
 } from './converter';
 
 export async function fetchUsers({
+  logger,
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
 
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
@@ -39,10 +40,11 @@ export async function fetchUsers({
 }
 
 export async function fetchGroups({
+  logger,
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
 
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
@@ -56,10 +58,11 @@ export async function fetchGroups({
 }
 
 export async function fetchRoles({
+  logger,
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
 
   await apiClient.iterateRoles(async (role) => {
     await jobState.addEntity(createRoleEntity(role));
@@ -101,10 +104,11 @@ export async function buildGroupUserRelationships({
 }
 
 export async function buildUserRoleRelationships({
+  logger,
   jobState,
   instance,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
 
   await apiClient.iterateAccessUsers(async (userWithRole) => {
     const { user, role } = userWithRole;

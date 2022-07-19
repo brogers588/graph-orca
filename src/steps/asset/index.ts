@@ -11,10 +11,11 @@ import { Entities, Steps, Relationships } from '../constants';
 import { createAccountAssetRelationship, createAssetEntity } from './converter';
 
 export async function fetchAssets({
+  logger,
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const apiClient = createAPIClient(instance.config);
+  const apiClient = createAPIClient(instance.config, logger);
 
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 

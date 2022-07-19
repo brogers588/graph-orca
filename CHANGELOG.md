@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.1 - 2022-07-19
+
+### Changed
+
+- Improve request error logging
+
 ## 1.2.0 - 2022-06-17
 
 ### Changed

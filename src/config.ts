@@ -57,7 +57,10 @@ export interface IntegrationConfig extends IntegrationInstanceConfig {
 export async function validateInvocation(
   context: IntegrationExecutionContext<IntegrationConfig>,
 ) {
-  const { config } = context.instance;
+  const {
+    logger,
+    instance: { config },
+  } = context;
 
   if (!config.clientSecret || !config.clientEmail || !config.clientBaseUrl) {
     throw new IntegrationValidationError(
@@ -65,6 +68,6 @@ export async function validateInvocation(
     );
   }
 
-  const apiClient = createAPIClient(config);
+  const apiClient = createAPIClient(config, logger);
   await apiClient.verifyAuthentication();
 }
