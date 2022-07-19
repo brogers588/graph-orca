@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.2 - 2022-07-19
+
+### Fixed
+
+- Switch asset collection to use the export API to bypass pagination limit of
+  10,000 assets
+
 ## 1.2.1 - 2022-07-19
 
 ### Changed
