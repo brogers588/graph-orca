@@ -440,6 +440,8 @@ export class APIClient {
 
       exportedAssets = JSON.parse(exportedAssetText) as OrcaAsset[];
     } catch (err) {
+      this.logger.warn({ err }, 'Failed to parse exported assets');
+
       throw new IntegrationError({
         code: 'ASSET_EXPORT_PARSE_ERROR',
         message: 'Failed to parse exported assets',
