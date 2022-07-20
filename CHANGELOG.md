@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.5 - 2022-07-20
+
+### Fixed
+
+- Stream asset API response as JSON into memory to handle large responses
+
 ## 1.2.4 - 2022-07-20
 
 ### Fixed
