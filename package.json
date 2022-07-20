@@ -36,9 +36,11 @@
     "@jupiterone/integration-sdk-core": "^8.13.11",
     "@jupiterone/integration-sdk-dev-tools": "^8.13.11",
     "@jupiterone/integration-sdk-testing": "^8.13.11",
-    "@types/node-fetch": "2.6.1"
+    "@types/node-fetch": "2.6.1",
+    "@types/stream-json": "^1.7.2"
   },
   "dependencies": {
-    "node-fetch": "2.6.7"
+    "node-fetch": "2.6.7",
+    "stream-json": "^1.7.4"
   }
 }

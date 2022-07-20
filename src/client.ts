@@ -25,8 +25,13 @@ import {
   OrcaAsyncDownloadResponse,
   OrcaAsyncDownloadStatusResponse,
 } from './types';
+import StreamArray from 'stream-json/streamers/StreamArray';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 
-export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
+const streamPipelineAsync = promisify(pipeline);
+
+export type ResourceIteratee<T> = (each: T) => Promise<void>;
 
 async function sleep(ms: number) {
   return new Promise<void>((resolve) => {
@@ -34,6 +39,21 @@ async function sleep(ms: number) {
       resolve();
     }, ms);
   });
+}
+
+async function streamArray<T>(
+  body: NodeJS.ReadableStream,
+  onElement: (item: T) => Promise<void>,
+): Promise<any> {
+  await streamPipelineAsync(
+    body,
+    StreamArray.withParser(),
+    async (iterateable) => {
+      for await (const el of iterateable) {
+        await onElement(el.value);
+      }
+    },
+  );
 }
 
 /**
@@ -424,21 +444,8 @@ export class APIClient {
       });
     }
 
-    let exportedAssets: OrcaAsset[] | undefined;
-
     try {
-      // NOTE: First pull the response body so we can verify that it has
-      // content. Then we will parse later.
-      const exportedAssetText = await exportAssetDownloadResponse.text();
-
-      this.logger.info(
-        {
-          exportedAssetTextLen: exportedAssetText.length,
-        },
-        'Export asset body downloaded',
-      );
-
-      exportedAssets = JSON.parse(exportedAssetText) as OrcaAsset[];
+      await streamArray<OrcaAsset>(exportAssetDownloadResponse.body, iteratee);
     } catch (err) {
       this.logger.warn({ err }, 'Failed to parse exported assets');
 
@@ -447,17 +454,6 @@ export class APIClient {
         message: 'Failed to parse exported assets',
         fatal: false,
       });
-    }
-
-    this.logger.info(
-      {
-        exportedAssets: exportedAssets.length,
-      },
-      'Succesfully exported assets',
-    );
-
-    for (const asset of exportedAssets) {
-      await iteratee(asset);
     }
   }
 
