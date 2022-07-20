@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.4 - 2022-07-20
+
+### Fixed
+
+- Log warning with error details when failing to parse asset export file
+
 ## 1.2.3 - 2022-07-20
 
 ### Changed
