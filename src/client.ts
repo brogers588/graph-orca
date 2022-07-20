@@ -397,7 +397,55 @@ export class APIClient {
     );
 
     const exportAssetDownloadResponse = await fetch(downloadUrl);
-    const exportedAssets = await exportAssetDownloadResponse.json();
+
+    if (!exportAssetDownloadResponse.ok) {
+      let exportedAssetTextLen: number | undefined;
+
+      try {
+        const exportedAssetText = await exportAssetDownloadResponse.text();
+        exportedAssetTextLen = exportedAssetText.length;
+      } catch (err) {
+        // Ignore if this fails. We are just gathering more info.
+      }
+
+      this.logger.warn(
+        {
+          exportedAssetTextLen,
+          status: exportAssetDownloadResponse.status,
+          statusText: exportAssetDownloadResponse.statusText,
+        },
+        'Failed to download exported assets file',
+      );
+
+      throw new IntegrationError({
+        code: 'ASSET_DOWNLOAD_ERROR',
+        message: 'Failed to download exported assets file',
+        fatal: false,
+      });
+    }
+
+    let exportedAssets: OrcaAsset[] | undefined;
+
+    try {
+      // NOTE: First pull the response body so we can verify that it has
+      // content. Then we will parse later.
+      const exportedAssetText = await exportAssetDownloadResponse.text();
+
+      this.logger.info(
+        {
+          exportedAssetTextLen: exportedAssetText.length,
+        },
+        'Export asset body downloaded',
+      );
+
+      exportedAssets = JSON.parse(exportedAssetText) as OrcaAsset[];
+    } catch (err) {
+      throw new IntegrationError({
+        code: 'ASSET_EXPORT_PARSE_ERROR',
+        message: 'Failed to parse exported assets',
+        fatal: false,
+      });
+    }
 
     this.logger.info(
       {

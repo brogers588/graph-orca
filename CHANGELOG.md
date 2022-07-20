@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.3 - 2022-07-20
+
+### Changed
+
+- Improve error handling when downloading an asset export file
+
 ## 1.2.2 - 2022-07-19
 
 ### Fixed
