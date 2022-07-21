@@ -185,35 +185,72 @@ export class APIClient {
       await this.authenticate();
     }
 
-    const response = await this.authenticateAndFetch(url, 0, 1, method, body);
+    const makeAuthenticatedRequest = async (authRetryCount: number) => {
+      if (authRetryCount > 0) {
+        this.logger.info(
+          {
+            authRetryCount,
+            endpoint,
+            method,
+          },
+          'Making authenticated request',
+        );
+      }
 
-    if (response.ok) {
-      return response.json();
-    } else {
-      try {
-        // Orca includes additional information upon request failures.
-        // Example:
-        //
-        // { status: 'failure', error: 'invalid limit 1000000' }
+      const response = await this.authenticateAndFetch(url, 0, 1, method, body);
+
+      if (response.ok) {
+        return response.json();
+      } else {
+        let errorResultBody;
+
+        try {
+          // Orca includes additional information upon request failures.
+          // Example:
+          //
+          // { status: 'failure', error: 'invalid limit 1000000' }
+          errorResultBody = await response.json();
+        } catch (err) {
+          // Unable to parse the error result body, but still should log
+          // additional info below.
+        }
+
         this.logger.warn(
           {
-            result: await response.json(),
+            result: errorResultBody,
             endpoint: url,
             status: response.status,
             statusText: response.statusText,
+            authRetryCount,
           },
           'Error making request',
         );
-      } catch (err) {
-        // Could not parse the JSON body. Skip.
-      }
 
-      throw new IntegrationProviderAPIError({
-        endpoint: url,
-        status: response.status,
-        statusText: response.statusText,
-      });
-    }
+        if (
+          authRetryCount < 4 &&
+          response.status === 403 &&
+          errorResultBody?.status === 'failure'
+        ) {
+          // This probably means that our token expired and we need to refresh
+          // Example from Orca API:
+          //
+          // result.message: 'Given token not valid for any token type'
+          // result.status: 'failure'
+          // status: 403
+          // statusText: 'Forbidden'
+          await this.authenticate();
+          return makeAuthenticatedRequest(++authRetryCount);
+        }
+
+        throw new IntegrationProviderAPIError({
+          endpoint: url,
+          status: response.status,
+          statusText: response.statusText,
+        });
+      }
+    };
+
+    return makeAuthenticatedRequest(0);
   }
 
   /**

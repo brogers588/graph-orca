@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.2.6 - 2022-07-20
+
+### Fixed
+
+- Refresh auth token when invalid token error received
+
 ## 1.2.5 - 2022-07-20
 
 ### Fixed
