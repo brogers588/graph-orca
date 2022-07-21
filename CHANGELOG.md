@@ -8,6 +8,42 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.3.0 - 2022-07-21
+
+### Added
+
+- New properties added to resources:
+
+  | Entity         | Properties              |
+  | -------------- | ----------------------- |
+  | `orca_finding` | `groupType`             |
+  | `orca_finding` | `clusterType`           |
+  | `orca_finding` | `type`                  |
+  | `orca_finding` | `assetCategory`         |
+  | `orca_finding` | `assetType`             |
+  | `orca_finding` | `cloudVendorId`         |
+  | `orca_finding` | `assetDistributionName` |
+  | `orca_finding` | `cloudProvider`         |
+  | `orca_asset`   | `enabled`               |
+  | `orca_asset`   | `type`                  |
+  | `orca_asset`   | `state`                 |
+  | `orca_asset`   | `groupType`             |
+  | `orca_asset`   | `clusterType`           |
+  | `orca_asset`   | `category`              |
+  | `orca_asset`   | `cloudVendorId`         |
+  | `orca_asset`   | `cloudProvider`         |
+  | `orca_asset`   | `cloudProviderId`       |
+  | `orca_asset`   | `level`                 |
+  | `orca_asset`   | `clusterUniqueId`       |
+  | `orca_asset`   | `clusterName`           |
+  | `orca_asset`   | `organizationId`        |
+  | `orca_asset`   | `accountName`           |
+
+### Fixed
+
+- Handle potential duplicate `_key` error upon receiving a duplicate Orca
+  finding from the API
+
 ## 1.2.6 - 2022-07-20
 
 ### Fixed

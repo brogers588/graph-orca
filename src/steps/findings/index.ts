@@ -29,7 +29,14 @@ export async function fetchCVEs({
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
   await apiClient.iterateCVEs(async (cve) => {
-    const findingEntity = await jobState.addEntity(createFindingEntity(cve));
+    const findingEntity = createFindingEntity(cve);
+
+    if (jobState.hasKey(findingEntity._key)) {
+      // Occasionally we see duplicate findings when iterating.
+      return;
+    }
+
+    await jobState.addEntity(findingEntity);
 
     await jobState.addRelationships([
       // Account -HAS-> Finding

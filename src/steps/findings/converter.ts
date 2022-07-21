@@ -48,6 +48,14 @@ export function createFindingEntity(cve: OrcaCVE): Entity {
           ? [cve.vendor_source_link]
           : undefined,
         fixable: fixAvailable === true,
+        groupType: cve.group_type,
+        clusterType: cve.cluster_type,
+        type: cve.type,
+        assetCategory: cve.asset_category,
+        assetType: cve.asset_type,
+        cloudVendorId: cve.cloud_vendor_id,
+        assetDistributionName: cve.asset_distribution_name,
+        cloudProvider: cve.cloud_provider,
       },
     },
   });

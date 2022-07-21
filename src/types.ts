@@ -39,6 +39,21 @@ export interface OrcaAsyncDownloadStatusResponse {
 export interface OrcaAsset {
   asset_unique_id: string;
   asset_name: string;
+
+  group_type: string;
+  cluster_type: string;
+  asset_category: string;
+  cloud_vendor_id: string;
+  cloud_provider: string;
+  cloud_provider_id: string;
+
+  asset_state: string; // 'enabled'
+  level: number;
+  cluster_unique_id: string;
+  cluster_name: string;
+  organization_id: string;
+  account_name: string;
+  asset_type: string;
 }
 
 export interface OrcaCVE {
@@ -63,6 +78,12 @@ export interface OrcaCVE {
   asset_type: string;
   summary: string;
   severity: string;
+  group_type: string;
+  cluster_type: string;
+  asset_category: string;
+  cloud_vendor_id: string;
+  asset_distribution_name: string;
+  cloud_provider: string;
 }
 
 export interface OrcaResponse<T> {
