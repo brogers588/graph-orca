@@ -86,6 +86,103 @@ export interface OrcaCVE {
   cloud_provider: string;
 }
 
+export interface OrcaAlertCVE {
+  summary: string;
+  severity: string;
+  vendor_source_link: string;
+  fix_available_state: string;
+  published: Date;
+  type: string;
+  packages?: { installed_version: string; package_name: string }[];
+  source_link: string;
+  score: number;
+  cve_id: string;
+  fix_available: boolean;
+  cvss3_vector: string;
+  affected_packages: string[];
+  nvd?: {
+    cvss2_severity: string;
+    cvss2_score: number;
+    cvss3_severity: string;
+    cvss3_vector: string;
+    cvss3_score: number;
+    cvss2_vector: string;
+  };
+  cvss3_score: number;
+}
+
+export interface OrcaAlert {
+  group_val: string;
+  asset_type_string: string;
+  data: {
+    recommendation: string;
+    details: string;
+    title: string;
+  };
+  alert_labels: string[];
+  configuration: unknown;
+  is_compliance: boolean;
+  group_type_string: string;
+  description: string;
+  recommendation: string;
+  source: string;
+  group_type: string;
+  cluster_type: string;
+  type: string;
+  group_unique_id: string;
+  cloud_account_id: string;
+  type_string: string;
+  asset_name: string;
+  account_name: string;
+  asset_type: string;
+  context: string;
+  details: string;
+  model: unknown;
+  state: {
+    severity: string;
+    last_updated: Date;
+    last_seen: Date;
+    in_verification: boolean;
+    low_since?: any;
+    created_at: Date;
+    verification_status: string;
+    score: number;
+    alert_id: string;
+    high_since: Date;
+    closed_reason: string;
+    status_time: Date;
+    status: string;
+  };
+  rule_query: string;
+  cluster_unique_id: string;
+  cluster_name: string;
+  subject_type: string;
+  group_name: string;
+  level: number;
+  tags_info_list: string[];
+  is_rule: boolean;
+  cloud_provider: string;
+  organization_name: string;
+  type_key: string;
+  cloud_vendor_id: string;
+  rule_id: string;
+  asset_category: string;
+  asset_state: string;
+  asset_tags_info_list: string[];
+  asset_distribution_name: string;
+  asset_distribution_version?: string;
+  asset_distribution_major_version?: string;
+  organization_id: string;
+  asset_unique_id: string;
+  cloud_provider_id: string;
+  category: string;
+  asset_vendor_id: string;
+  findings?: {
+    cve?: OrcaAlertCVE[];
+  };
+  vm_id?: string;
+}
+
 export interface OrcaResponse<T> {
   status: string;
   version: string;

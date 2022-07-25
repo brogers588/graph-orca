@@ -13,12 +13,13 @@ export const Steps = {
   ROLES: 'fetch-roles',
   ASSETS: 'fetch-assets',
   FINDINGS: 'fetch-findings',
+  ALERTS: 'fetch-alerts',
   GROUP_USER_RELATIONSHIPS: 'build-user-group-relationships',
   USER_ROLE_RELATIONSHIPS: 'build-user-role-relationships',
 };
 
 export const Entities: Record<
-  'ACCOUNT' | 'GROUP' | 'USER' | 'ROLE' | 'ASSET' | 'FINDING' | 'CVE',
+  'ACCOUNT' | 'GROUP' | 'USER' | 'ROLE' | 'ASSET' | 'FINDING' | 'CVE' | 'ALERT',
   StepEntityMetadata
 > = {
   ACCOUNT: {
@@ -105,6 +106,17 @@ export const Entities: Record<
       required: ['name', 'displayName', 'cvssScore', 'references', 'weblink'],
     },
   },
+  ALERT: {
+    resourceName: 'Alert',
+    _type: 'orca_alert_finding',
+    _class: ['Finding'],
+    schema: {
+      properties: {
+        name: { type: 'string' },
+      },
+      required: ['name', 'category'],
+    },
+  },
 };
 
 export const MappedRelationships: Record<
@@ -127,6 +139,8 @@ export const Relationships: Record<
   | 'GROUP_HAS_USER'
   | 'USER_ASSIGNED_ROLE'
   | 'ACCOUNT_HAS_FINDING'
+  | 'ACCOUNT_HAS_ALERT'
+  | 'ALERT_HAS_FINDING'
   | 'ASSET_HAS_FINDING',
   StepRelationshipMetadata
 > = {
@@ -169,6 +183,18 @@ export const Relationships: Record<
   ASSET_HAS_FINDING: {
     _type: 'orca_asset_has_finding',
     sourceType: Entities.ASSET._type,
+    _class: RelationshipClass.HAS,
+    targetType: Entities.FINDING._type,
+  },
+  ACCOUNT_HAS_ALERT: {
+    _type: 'orca_account_has_alert_finding',
+    sourceType: Entities.ACCOUNT._type,
+    _class: RelationshipClass.HAS,
+    targetType: Entities.ALERT._type,
+  },
+  ALERT_HAS_FINDING: {
+    _type: 'orca_alert_finding_has_finding',
+    sourceType: Entities.ALERT._type,
     _class: RelationshipClass.HAS,
     targetType: Entities.FINDING._type,
   },

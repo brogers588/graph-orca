@@ -24,6 +24,7 @@ import {
   OrcaResponse,
   OrcaAsyncDownloadResponse,
   OrcaAsyncDownloadStatusResponse,
+  OrcaAlert,
 } from './types';
 import StreamArray from 'stream-json/streamers/StreamArray';
 import { pipeline } from 'stream';
@@ -367,8 +368,103 @@ export class APIClient {
     }
   }
 
-  async waitForAssetDownloadUrl(requestToken: string): Promise<string> {
-    let assetUrl: string | undefined;
+  /**
+   * Iterates each asset resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateAssets(
+    iteratee: ResourceIteratee<OrcaAsset>,
+  ): Promise<void> {
+    await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/assets');
+  }
+
+  /**
+   * Iterates each cve resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
+    await this.paginatedQuery('/query/cves', iteratee);
+  }
+
+  public async iterateAlerts(
+    iteratee: ResourceIteratee<OrcaAlert>,
+  ): Promise<void> {
+    await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/alerts');
+  }
+
+  /**
+   * Uses the bulk JSON download endpoints to fetch data.
+   * @param endpoint
+   * @param iteratee
+   * @param body
+   * @private
+   */
+  private async iterateViaBulkDownload<T>(
+    iteratee: ResourceIteratee<T>,
+    endpoint: string,
+    body?: object,
+  ): Promise<void> {
+    const response = await this.request<OrcaAsyncDownloadResponse>(
+      endpoint,
+      'POST',
+      {
+        download_async: true,
+        get_download_link: true,
+        // ...body,
+      },
+    );
+
+    const downloadUrl = await this.waitForResourceDownloadUrl(
+      response.request_token,
+    );
+
+    const exportResourceDownloadResponse = await fetch(downloadUrl);
+
+    if (!exportResourceDownloadResponse.ok) {
+      let exportedResourceTextLen: number | undefined;
+
+      try {
+        const exportedResourceText =
+          await exportResourceDownloadResponse.text();
+        exportedResourceTextLen = exportedResourceText.length;
+      } catch (err) {
+        // Ignore if this fails. We are just gathering more info.
+      }
+
+      this.logger.warn(
+        {
+          endpoint,
+          exportedResourceTextLen,
+          status: exportResourceDownloadResponse.status,
+          statusText: exportResourceDownloadResponse.statusText,
+        },
+        'Failed to download exported resource file',
+      );
+
+      throw new IntegrationError({
+        code: 'RESOURCE_DOWNLOAD_ERROR',
+        message: 'Failed to download exported resource file',
+        fatal: false,
+      });
+    }
+
+    try {
+      await streamArray<T>(exportResourceDownloadResponse.body, iteratee);
+    } catch (err) {
+      this.logger.warn({ err }, 'Failed to parse exported resources');
+
+      throw new IntegrationError({
+        code: 'RESOURCE_EXPORT_PARSE_ERROR',
+        message: 'Failed to parse exported resources',
+        fatal: false,
+      });
+    }
+  }
+
+  async waitForResourceDownloadUrl(requestToken: string): Promise<string> {
+    let resourceUrl: string | undefined;
     let totalSleepTimeMs = 0;
 
     let totalIterations = 0;
@@ -405,102 +501,31 @@ export class APIClient {
               file_location: !!statusResponse.file_location,
             },
           },
-          'Failed to fetch asset query status',
+          'Failed to fetch resource query status',
         );
 
         throw new IntegrationProviderAPIError({
           endpoint: '/query/status',
           status: 200,
-          statusText: 'Failed to fetch asset query status',
-          message: 'Failed to fetch asset query status',
+          statusText: 'Failed to fetch resource query status',
+          message: 'Failed to fetch resource query status',
         });
       }
 
       if (totalSleepTimeMs >= maxSleepTimeMs) {
         throw new IntegrationError({
-          code: 'ASSET_DOWNLOAD_TIMEOUT',
-          message: `Maximum time reached when attempting to export Orca assets (timeElapsed=${maxSleepTimeMs}ms)`,
+          code: 'RESOURCE_DOWNLOAD_TIMEOUT',
+          message: `Maximum time reached when attempting to export Orca resource (timeElapsed=${maxSleepTimeMs}ms)`,
           fatal: false,
         });
       }
 
       if (statusResponse.file_location) {
-        assetUrl = statusResponse.file_location;
+        resourceUrl = statusResponse.file_location;
       }
-    } while (!assetUrl);
+    } while (!resourceUrl);
 
-    return assetUrl;
-  }
-
-  /**
-   * Iterates each asset resource in the provider.
-   *
-   * @param iteratee receives each resource to produce entities/relationships
-   */
-  public async iterateAssets(
-    iteratee: ResourceIteratee<OrcaAsset>,
-  ): Promise<void> {
-    const response = await this.request<OrcaAsyncDownloadResponse>(
-      '/query/assets',
-      'POST',
-      {
-        download_async: true,
-        get_download_link: true,
-      },
-    );
-
-    const downloadUrl = await this.waitForAssetDownloadUrl(
-      response.request_token,
-    );
-
-    const exportAssetDownloadResponse = await fetch(downloadUrl);
-
-    if (!exportAssetDownloadResponse.ok) {
-      let exportedAssetTextLen: number | undefined;
-
-      try {
-        const exportedAssetText = await exportAssetDownloadResponse.text();
-        exportedAssetTextLen = exportedAssetText.length;
-      } catch (err) {
-        // Ignore if this fails. We are just gathering more info.
-      }
-
-      this.logger.warn(
-        {
-          exportedAssetTextLen,
-          status: exportAssetDownloadResponse.status,
-          statusText: exportAssetDownloadResponse.statusText,
-        },
-        'Failed to download exported assets file',
-      );
-
-      throw new IntegrationError({
-        code: 'ASSET_DOWNLOAD_ERROR',
-        message: 'Failed to download exported assets file',
-        fatal: false,
-      });
-    }
-
-    try {
-      await streamArray<OrcaAsset>(exportAssetDownloadResponse.body, iteratee);
-    } catch (err) {
-      this.logger.warn({ err }, 'Failed to parse exported assets');
-
-      throw new IntegrationError({
-        code: 'ASSET_EXPORT_PARSE_ERROR',
-        message: 'Failed to parse exported assets',
-        fatal: false,
-      });
-    }
-  }
-
-  /**
-   * Iterates each cve resource in the provider.
-   *
-   * @param iteratee receives each resource to produce entities/relationships
-   */
-  public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
-    await this.paginatedQuery('/query/cves', iteratee);
+    return resourceUrl;
   }
 }
 

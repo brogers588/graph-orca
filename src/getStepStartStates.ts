@@ -18,6 +18,7 @@ export default function getStepStartStates(
     [Steps.ROLES]: { disabled: false },
     [Steps.ASSETS]: { disabled: !enableAssetAndFindingIngestion },
     [Steps.FINDINGS]: { disabled: !enableAssetAndFindingIngestion },
+    [Steps.ALERTS]: { disabled: !enableAssetAndFindingIngestion },
     [Steps.GROUP_USER_RELATIONSHIPS]: { disabled: false },
     [Steps.USER_ROLE_RELATIONSHIPS]: { disabled: false },
   };
