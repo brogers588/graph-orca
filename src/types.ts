@@ -46,8 +46,8 @@ export interface OrcaAsset {
   cloud_vendor_id: string;
   cloud_provider: string;
   cloud_provider_id: string;
-
-  asset_state: string; // 'enabled'
+  asset_vendor_id: string;
+  asset_state: string; // 'enabled', 'running'
   level: number;
   cluster_unique_id: string;
   cluster_name: string;
@@ -84,6 +84,7 @@ export interface OrcaCVE {
   cloud_vendor_id: string;
   asset_distribution_name: string;
   cloud_provider: string;
+  asset_vendor_id: string;
 }
 
 export interface OrcaAlertCVE {

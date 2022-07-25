@@ -19,7 +19,8 @@ export function createAssetEntity(asset: OrcaAsset): Entity {
         _key: asset.asset_unique_id,
         name: asset.asset_name,
         id: asset.asset_unique_id,
-        enabled: asset.asset_state === 'enabled',
+        enabled:
+          asset.asset_state === 'enabled' || asset.asset_state === 'running',
         state: asset.asset_state,
         type: asset.asset_type,
         groupType: asset.group_type,
@@ -33,6 +34,7 @@ export function createAssetEntity(asset: OrcaAsset): Entity {
         clusterName: asset.cluster_name,
         organizationId: asset.organization_id,
         accountName: asset.account_name,
+        assetVendorId: asset.asset_vendor_id,
       },
     },
   });
