@@ -1,6 +1,6 @@
 {
   "name": "@jupiterone/graph-orca",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A JupiterOne Integration for ingesting data for the Orca",
   "license": "MPL-2.0",
   "main": "src/index.js",

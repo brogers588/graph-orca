@@ -8,6 +8,22 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.4.0 - 2022-07-25
+
+### Added
+
+- New properties added to resources:
+
+  | Entity         | Properties      |
+  | -------------- | --------------- |
+  | `orca_finding` | `assetVendorId` |
+  | `orca_asset`   | `assetVendorId` |
+
+### Fixed
+
+- Consider whether `asset_state` has value `"running"` when calculating
+  `orca_asset` `enabled` property value
+
 ## 1.3.0 - 2022-07-21
 
 ### Added

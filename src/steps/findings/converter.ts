@@ -56,6 +56,7 @@ export function createFindingEntity(cve: OrcaCVE): Entity {
         cloudVendorId: cve.cloud_vendor_id,
         assetDistributionName: cve.asset_distribution_name,
         cloudProvider: cve.cloud_provider,
+        assetVendorId: cve.asset_vendor_id,
       },
     },
   });
