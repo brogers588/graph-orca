@@ -8,10 +8,7 @@ import {
 } from '@jupiterone/integration-sdk-core';
 import { Entities } from '../constants';
 
-export function createAlertFindingEntity(
-  alert: OrcaAlert,
-  baseUrl: string,
-): Entity {
+export function createAlertFindingEntity(alert: OrcaAlert): Entity {
   return createIntegrationEntity({
     entityData: {
       source: alert,

@@ -14,10 +14,7 @@ export async function fetchAlerts({ logger, instance, jobState }) {
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
   await apiClient.iterateAlerts(async (alert) => {
-    const alertEntity = createAlertFindingEntity(
-      alert,
-      instance.config.clientBaseUrl,
-    );
+    const alertEntity = createAlertFindingEntity(alert);
 
     await jobState.addEntity(alertEntity);
 
@@ -35,6 +32,8 @@ export async function fetchAlerts({ logger, instance, jobState }) {
             await jobState.addRelationship(
               createAlertFindingRelationship(alertEntity, findingEntity),
             );
+          } else {
+            logger.warn({ findingKey }, `Failed to find the Finding Entity.`);
           }
         }
       }
