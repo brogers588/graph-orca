@@ -376,7 +376,7 @@ export class APIClient {
   public async iterateAssets(
     iteratee: ResourceIteratee<OrcaAsset>,
   ): Promise<void> {
-    await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/assets');
+    await this.iterateViaBulkDownload<OrcaAsset>(iteratee, '/query/assets');
   }
 
   /**
