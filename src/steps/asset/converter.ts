@@ -35,6 +35,7 @@ export function createAssetEntity(asset: OrcaAsset): Entity {
         organizationId: asset.organization_id,
         accountName: asset.account_name,
         assetVendorId: asset.asset_vendor_id,
+        vmId: asset.vm_id,
       },
     },
   });
