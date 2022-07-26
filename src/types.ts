@@ -54,6 +54,7 @@ export interface OrcaAsset {
   organization_id: string;
   account_name: string;
   asset_type: string;
+  vm_id: string;
 }
 
 export interface OrcaCVE {
@@ -85,6 +86,7 @@ export interface OrcaCVE {
   asset_distribution_name: string;
   cloud_provider: string;
   asset_vendor_id: string;
+  vm_id: string;
 }
 
 export interface OrcaAlertCVE {

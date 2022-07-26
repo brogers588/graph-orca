@@ -8,6 +8,17 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.5.0 - 2022-07-26
+
+### Added
+
+- New properties added to resources:
+
+  | Entity         | Properties |
+  | -------------- | ---------- |
+  | `orca_finding` | `vmId`     |
+  | `orca_asset\`  | `vmId`     |
+
 ## 1.4.0 - 2022-07-25
 
 ### Added
