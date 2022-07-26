@@ -121,6 +121,7 @@ export interface OrcaAlert {
     title: string;
   };
   alert_labels: string[];
+  asset_labels: string[];
   configuration: unknown;
   is_compliance: boolean;
   group_type_string: string;
