@@ -120,13 +120,20 @@ export const Entities: Record<
 };
 
 export const MappedRelationships: Record<
-  'FINDING_IS_CVE',
+  'FINDING_IS_CVE' | 'ALERT_HAS_CVE',
   StepMappedRelationshipMetadata
 > = {
   FINDING_IS_CVE: {
     _type: 'orca_finding_is_cve',
     sourceType: Entities.FINDING._type,
     _class: RelationshipClass.IS,
+    targetType: Entities.CVE._type,
+    direction: RelationshipDirection.FORWARD,
+  },
+  ALERT_HAS_CVE: {
+    _type: 'orca_alert_finding_has_cve',
+    sourceType: Entities.ALERT._type,
+    _class: RelationshipClass.HAS,
     targetType: Entities.CVE._type,
     direction: RelationshipDirection.FORWARD,
   },

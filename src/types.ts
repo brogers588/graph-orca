@@ -101,7 +101,7 @@ export interface OrcaAlertCVE {
   fix_available: boolean;
   cvss3_vector: string;
   affected_packages: string[];
-  nvd?: {
+  nvd: {
     cvss2_severity: string;
     cvss2_score: number;
     cvss3_severity: string;
