@@ -110,6 +110,9 @@ export const Entities: Record<
     resourceName: 'Alert',
     _type: 'orca_finding_alert',
     _class: ['Finding'],
+    indexMetadata: {
+      enabled: false,
+    },
     schema: {
       properties: {
         name: { type: 'string' },

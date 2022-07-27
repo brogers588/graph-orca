@@ -392,7 +392,6 @@ export class APIClient {
     iteratee: ResourceIteratee<OrcaAlert>,
   ): Promise<void> {
     await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/alerts', {
-      show_informational_alerts: true,
       dsl_filter: {
         filter: [
           {

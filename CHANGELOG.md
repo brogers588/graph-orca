@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.6.1 - 2022-07-27
+
+### Changed
+
+- Removed ingestion of information alerts
+- Disable storing `orca_alert_finding` on file system. Orca alert findings can
+  be super high volume. We don't iterate this data in later steps, so we can
+  safely disable storing the data on the file system to save disk space.
+
 ## 1.6.0 - 2022-07-26
 
 ### Added
