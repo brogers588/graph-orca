@@ -8,6 +8,36 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.6.0 - 2022-07-26
+
+### Added
+
+- New Finding entity added based on Orca Alerts:
+
+| Resources | Entity `_type`       | Entity `_class` |
+| --------- | -------------------- | --------------- |
+| Alert     | `orca_finding_alert` | `Finding`       |
+
+The Orca alert is categorized into the following:
+
+- Authentication
+- Best practices
+- Data at risk
+- Data protection
+- IAM misconfigurations
+- Lateral movement
+- Logging and monitoring
+- Malicious activity
+- Neglected assets
+- Network misconfigurations
+- System integrity
+- Vendor services misconfigurations
+- Workload misconfigurations
+
+| Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
+| --------------------- | --------------------- | --------------------- |
+| `orca_account`        | **HAS**               | `orca_finding_alert`  |
+
 ## 1.5.0 - 2022-07-26
 
 ### Added
@@ -17,7 +47,7 @@ and this project adheres to
   | Entity         | Properties |
   | -------------- | ---------- |
   | `orca_finding` | `vmId`     |
-  | `orca_asset\`  | `vmId`     |
+  | `orca_asset`   | `vmId`     |
 
 ## 1.4.0 - 2022-07-25
 
