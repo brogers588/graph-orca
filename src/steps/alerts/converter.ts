@@ -1,15 +1,12 @@
-import { OrcaAlert, OrcaAlertCVE } from '../../types';
+import { OrcaAlert } from '../../types';
 import {
   createDirectRelationship,
   createIntegrationEntity,
-  createMappedRelationship,
   Entity,
   Relationship,
   RelationshipClass,
-  RelationshipDirection,
 } from '@jupiterone/integration-sdk-core';
 import { Entities } from '../constants';
-import { extractCVSS } from '../utils';
 
 export function createAlertFindingEntity(alert: OrcaAlert): Entity {
   return createIntegrationEntity({
@@ -69,48 +66,5 @@ export function createAccountAlertRelationship(
     _class: RelationshipClass.HAS,
     from: account,
     to: alert,
-  });
-}
-
-export function createAlertFindingRelationship(
-  alert: Entity,
-  finding: Entity,
-): Relationship {
-  return createDirectRelationship({
-    _class: RelationshipClass.HAS,
-    from: alert,
-    to: finding,
-  });
-}
-
-export function createAlertFindingToCveRelationship(
-  alert: Entity,
-  cve: OrcaAlertCVE,
-): Relationship {
-  const { score, vector } = extractCVSS(cve);
-  const cveIdDisplay = cve.cve_id.toUpperCase();
-
-  return createMappedRelationship({
-    _class: RelationshipClass.HAS,
-    _type: 'orca_alert_finding_has_cve',
-    _mapping: {
-      sourceEntityKey: alert._key,
-      relationshipDirection: RelationshipDirection.FORWARD,
-      skipTargetCreation: false,
-      targetFilterKeys: [['_type', '_key']],
-      targetEntity: {
-        _key: cve.cve_id.toLowerCase(),
-        _type: 'cve',
-        id: cve.cve_id,
-        score: score ?? cve.score,
-        vector,
-        name: cveIdDisplay,
-        displayName: cveIdDisplay,
-        numericSeverity: score ?? cve.score,
-        severity: cve.severity,
-        references: [`https://nvd.nist.gov/vuln/detail/${cve.cve_id}`],
-        webLink: `https://nvd.nist.gov/vuln/detail/${cve.cve_id}`,
-      },
-    },
   });
 }
