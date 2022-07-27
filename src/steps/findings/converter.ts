@@ -10,21 +10,7 @@ import {
 
 import { Entities } from '../constants';
 import { OrcaCVE } from '../../types';
-
-function extractCVSS(cve: OrcaCVE): {
-  score: number;
-  vector: string;
-} {
-  return cve.nvd.cvss3_score
-    ? {
-        score: cve.nvd.cvss3_score,
-        vector: cve.nvd.cvss3_vector,
-      }
-    : {
-        score: cve.nvd.cvss2_score,
-        vector: cve.nvd.cvss2_vector,
-      };
-}
+import { buildFindingKey, extractCVSS } from '../utils';
 
 export function createFindingEntity(cve: OrcaCVE): Entity {
   const { score, vector } = extractCVSS(cve);
@@ -36,7 +22,7 @@ export function createFindingEntity(cve: OrcaCVE): Entity {
       assign: {
         _type: Entities.FINDING._type,
         _class: Entities.FINDING._class,
-        _key: `${cve.asset_unique_id}:${cve.cve_id}`,
+        _key: buildFindingKey(cve.asset_unique_id, cve.cve_id),
         name: cve.cve_id,
         score: score ?? cve.score,
         vector,

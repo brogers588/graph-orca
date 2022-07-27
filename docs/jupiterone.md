@@ -81,14 +81,15 @@ https://github.com/JupiterOne/sdk/blob/main/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources | Entity `_type` | Entity `_class` |
-| --------- | -------------- | --------------- |
-| Account   | `orca_account` | `Account`       |
-| Asset     | `orca_asset`   | `Resource`      |
-| Finding   | `orca_finding` | `Finding`       |
-| Role      | `orca_role`    | `AccessRole`    |
-| User      | `orca_user`    | `User`          |
-| UserGroup | `orca_group`   | `UserGroup`     |
+| Resources | Entity `_type`       | Entity `_class` |
+| --------- | -------------------- | --------------- |
+| Account   | `orca_account`       | `Account`       |
+| Alert     | `orca_finding_alert` | `Finding`       |
+| Asset     | `orca_asset`         | `Resource`      |
+| Finding   | `orca_finding`       | `Finding`       |
+| Role      | `orca_role`          | `AccessRole`    |
+| User      | `orca_user`          | `User`          |
+| UserGroup | `orca_group`         | `UserGroup`     |
 
 ### Relationships
 
@@ -98,6 +99,7 @@ The following relationships are created:
 | --------------------- | --------------------- | --------------------- |
 | `orca_account`        | **HAS**               | `orca_asset`          |
 | `orca_account`        | **HAS**               | `orca_finding`        |
+| `orca_account`        | **HAS**               | `orca_finding_alert`  |
 | `orca_account`        | **HAS**               | `orca_group`          |
 | `orca_account`        | **HAS**               | `orca_user`           |
 | `orca_asset`          | **HAS**               | `orca_finding`        |
