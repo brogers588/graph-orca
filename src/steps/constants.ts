@@ -108,7 +108,7 @@ export const Entities: Record<
   },
   ALERT: {
     resourceName: 'Alert',
-    _type: 'orca_alert_finding',
+    _type: 'orca_finding_alert',
     _class: ['Finding'],
     schema: {
       properties: {
@@ -120,20 +120,13 @@ export const Entities: Record<
 };
 
 export const MappedRelationships: Record<
-  'FINDING_IS_CVE' | 'ALERT_HAS_CVE',
+  'FINDING_IS_CVE',
   StepMappedRelationshipMetadata
 > = {
   FINDING_IS_CVE: {
     _type: 'orca_finding_is_cve',
     sourceType: Entities.FINDING._type,
     _class: RelationshipClass.IS,
-    targetType: Entities.CVE._type,
-    direction: RelationshipDirection.FORWARD,
-  },
-  ALERT_HAS_CVE: {
-    _type: 'orca_alert_finding_has_cve',
-    sourceType: Entities.ALERT._type,
-    _class: RelationshipClass.HAS,
     targetType: Entities.CVE._type,
     direction: RelationshipDirection.FORWARD,
   },
@@ -146,8 +139,7 @@ export const Relationships: Record<
   | 'GROUP_HAS_USER'
   | 'USER_ASSIGNED_ROLE'
   | 'ACCOUNT_HAS_FINDING'
-  | 'ACCOUNT_HAS_ALERT'
-  | 'ALERT_HAS_FINDING'
+  | 'ACCOUNT_HAS_FINDING_ALERT'
   | 'ASSET_HAS_FINDING',
   StepRelationshipMetadata
 > = {
@@ -193,16 +185,10 @@ export const Relationships: Record<
     _class: RelationshipClass.HAS,
     targetType: Entities.FINDING._type,
   },
-  ACCOUNT_HAS_ALERT: {
-    _type: 'orca_account_has_alert_finding',
+  ACCOUNT_HAS_FINDING_ALERT: {
+    _type: 'orca_account_has_finding_alert',
     sourceType: Entities.ACCOUNT._type,
     _class: RelationshipClass.HAS,
     targetType: Entities.ALERT._type,
-  },
-  ALERT_HAS_FINDING: {
-    _type: 'orca_alert_finding_has_finding',
-    sourceType: Entities.ALERT._type,
-    _class: RelationshipClass.HAS,
-    targetType: Entities.FINDING._type,
   },
 };

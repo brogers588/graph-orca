@@ -391,7 +391,31 @@ export class APIClient {
   public async iterateAlerts(
     iteratee: ResourceIteratee<OrcaAlert>,
   ): Promise<void> {
-    await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/alerts');
+    await this.iterateViaBulkDownload<OrcaAlert>(iteratee, '/query/alerts', {
+      dsl_filter: {
+        filter: [
+          {
+            field: 'category',
+            includes: [
+              'Authentication',
+              'Best practices',
+              'Data at risk',
+              'Data protection',
+              'IAM misconfigurations',
+              'Lateral movement',
+              'Logging and monitoring',
+              'Malicious activity',
+              'Neglected assets',
+              'Network misconfigurations',
+              'System integrity',
+              'Vendor services misconfigurations',
+              'Workload misconfigurations',
+              // Exclude 'Vulnerabilities' (handled in fetch-findings step)
+            ],
+          },
+        ],
+      },
+    });
   }
 
   /**
@@ -412,7 +436,7 @@ export class APIClient {
       {
         download_async: true,
         get_download_link: true,
-        // ...body,
+        ...body,
       },
     );
 

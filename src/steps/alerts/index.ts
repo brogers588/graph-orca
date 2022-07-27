@@ -1,20 +1,12 @@
 import { createAPIClient } from '../../client';
 import { Entity, IntegrationStep } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig } from '../../config';
-import {
-  Entities,
-  MappedRelationships,
-  Relationships,
-  Steps,
-} from '../constants';
+import { Entities, Relationships, Steps } from '../constants';
 import {
   createAccountAlertRelationship,
   createAlertFindingEntity,
-  createAlertFindingRelationship,
-  createAlertFindingToCveRelationship,
 } from './converter';
 import { ACCOUNT_ENTITY_KEY } from '../account';
-import { buildFindingKey } from '../utils';
 
 export async function fetchAlerts({ logger, instance, jobState }) {
   const apiClient = createAPIClient(instance.config, logger);
@@ -30,24 +22,10 @@ export async function fetchAlerts({ logger, instance, jobState }) {
     );
 
     if (alert.findings?.cve && Array.isArray(alert.findings?.cve)) {
-      for (const cve of alert.findings.cve) {
-        if (cve.cve_id) {
-          // alert -> cve
-          await jobState.addRelationship(
-            createAlertFindingToCveRelationship(alertEntity, cve),
-          );
-
-          // alert ?-> finding
-          const findingEntity = await jobState.findEntity(
-            buildFindingKey(alert.asset_unique_id, cve.cve_id),
-          );
-          if (findingEntity) {
-            await jobState.addRelationship(
-              createAlertFindingRelationship(alertEntity, findingEntity),
-            );
-          }
-        }
-      }
+      logger.warn(
+        { alertId: alert.state.alert_id, cve: alert.findings.cve },
+        'An unexpected cve was found in an Orca Alert findings. Vulns should be filtered out.',
+      );
     }
   });
 }
@@ -57,12 +35,8 @@ export const alertSteps: IntegrationStep<IntegrationConfig>[] = [
     id: Steps.ALERTS,
     name: 'Fetch Alerts',
     entities: [Entities.ALERT],
-    relationships: [
-      Relationships.ACCOUNT_HAS_ALERT,
-      Relationships.ALERT_HAS_FINDING,
-      MappedRelationships.ALERT_HAS_CVE,
-    ],
-    dependsOn: [Steps.ACCOUNT, Steps.FINDINGS],
+    relationships: [Relationships.ACCOUNT_HAS_FINDING_ALERT],
+    dependsOn: [Steps.ACCOUNT],
     executionHandler: fetchAlerts,
   },
 ];

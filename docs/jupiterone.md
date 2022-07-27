@@ -84,7 +84,7 @@ The following entities are created:
 | Resources | Entity `_type`       | Entity `_class` |
 | --------- | -------------------- | --------------- |
 | Account   | `orca_account`       | `Account`       |
-| Alert     | `orca_alert_finding` | `Finding`       |
+| Alert     | `orca_finding_alert` | `Finding`       |
 | Asset     | `orca_asset`         | `Resource`      |
 | Finding   | `orca_finding`       | `Finding`       |
 | Role      | `orca_role`          | `AccessRole`    |
@@ -97,13 +97,11 @@ The following relationships are created:
 
 | Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
 | --------------------- | --------------------- | --------------------- |
-| `orca_account`        | **HAS**               | `orca_alert_finding`  |
 | `orca_account`        | **HAS**               | `orca_asset`          |
 | `orca_account`        | **HAS**               | `orca_finding`        |
+| `orca_account`        | **HAS**               | `orca_finding_alert`  |
 | `orca_account`        | **HAS**               | `orca_group`          |
 | `orca_account`        | **HAS**               | `orca_user`           |
-| `orca_alert_finding`  | **HAS**               | `cve`                 |
-| `orca_alert_finding`  | **HAS**               | `orca_finding`        |
 | `orca_asset`          | **HAS**               | `orca_finding`        |
 | `orca_finding`        | **IS**                | `cve`                 |
 | `orca_group`          | **HAS**               | `orca_user`           |
