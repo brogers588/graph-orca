@@ -8,6 +8,17 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.7.0 - 2022-07-28
+
+### Added
+
+- New properties added to resources:
+
+  | Entity               | Properties      |
+  | -------------------- | --------------- |
+  | `orca_finding_alert` | `awsArn`        |
+  | `orca_finding_alert` | `uiUniqueField` |
+
 ## 1.6.1 - 2022-07-27
 
 ### Changed
