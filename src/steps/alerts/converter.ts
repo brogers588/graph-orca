@@ -53,9 +53,27 @@ export function createAlertFindingEntity(alert: OrcaAlert): Entity {
         organizationId: alert.organization_id,
         organizationName: alert.organization_name,
         vmId: alert.vm_id,
+        // This could be an AWS instance ID or an ARN
+        uiUniqueField: alert.model?.data?.Inventory?.UiUniqueField,
+        awsArn: getAwsArnFromAlert(alert),
       },
     },
   });
+}
+
+/**
+ * Orca alerts vendor IDs can include ARN values. This function extracts the AWS
+ * ARN from an Orca alert if it finds one, otherwise returns `undefined`
+ */
+export function getAwsArnFromAlert(alert: OrcaAlert): string | undefined {
+  const { asset_vendor_id: assetVendorId } = alert;
+  if (!assetVendorId || typeof assetVendorId !== 'string') return undefined;
+
+  const assetVendorIdParts = assetVendorId.split('_');
+
+  for (const assetVendorIdPart of assetVendorIdParts) {
+    if (assetVendorIdPart.startsWith('arn:')) return assetVendorIdPart;
+  }
 }
 
 export function createAccountAlertRelationship(
