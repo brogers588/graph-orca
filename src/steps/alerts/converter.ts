@@ -69,11 +69,12 @@ export function getAwsArnFromAlert(alert: OrcaAlert): string | undefined {
   const { asset_vendor_id: assetVendorId } = alert;
   if (!assetVendorId || typeof assetVendorId !== 'string') return undefined;
 
-  const assetVendorIdParts = assetVendorId.split('_');
+  // Get first instance of `_`
+  const assetVendorIdUnderscoreIndex = assetVendorId.indexOf('_');
+  if (assetVendorIdUnderscoreIndex === -1) return undefined;
 
-  for (const assetVendorIdPart of assetVendorIdParts) {
-    if (assetVendorIdPart.startsWith('arn:')) return assetVendorIdPart;
-  }
+  const remainder = assetVendorId.substring(assetVendorIdUnderscoreIndex + 1);
+  return remainder.startsWith('arn:') ? remainder : undefined;
 }
 
 export function createAccountAlertRelationship(

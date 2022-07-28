@@ -27,6 +27,17 @@ describe('#getAwsArnFromAlert', () => {
       'arn:aws:iam::123456789123:role/MyRole',
     );
   });
+
+  test('should return AWS ARN if `asset_vendor_id` includes an ARN with underscores', () => {
+    expect(
+      getAwsArnFromAlert(
+        createMockAlert({
+          asset_vendor_id:
+            'ABCDEFGHIJKLMNOP_arn:aws:iam::123456789123:role/my_role',
+        }),
+      ),
+    ).toEqual('arn:aws:iam::123456789123:role/my_role');
+  });
 });
 
 function createMockAlert(partial?: Partial<OrcaAlert>): OrcaAlert {

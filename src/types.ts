@@ -141,7 +141,7 @@ export interface OrcaAlert {
   asset_type: string;
   context: string;
   details: string;
-  model: any;
+  model: { [key: string]: any };
   state: {
     severity: string;
     last_updated: Date;
