@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.8.0 - 2022-07-28
+
+### Added
+
+- New properties added to resources:
+
+  | Entity               | Properties    |
+  | -------------------- | ------------- |
+  | `orca_finding_alert` | `assetLabels` |
+
 ## 1.7.0 - 2022-07-28
 
 ### Added
