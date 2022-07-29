@@ -87,6 +87,7 @@ export interface OrcaCVE {
   cloud_provider: string;
   asset_vendor_id: string;
   vm_id: string;
+  asset_labels: string[];
 }
 
 export interface OrcaAlertCVE {
