@@ -270,7 +270,7 @@ export class APIClient {
 
     do {
       const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
-        grouping: true,
+        grouping: false,
         start_at_index: page * LIMIT,
         limit: LIMIT,
       });
