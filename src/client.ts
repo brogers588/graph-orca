@@ -255,36 +255,6 @@ export class APIClient {
   }
 
   /**
-   * Makes a paginated request to the provided relative endpoint.
-   *
-   * @param uri the endpoint to query
-   * @param iteratee receives each resource to produce entities/relationships
-   */
-  private async paginatedQuery<T>(
-    uri: string,
-    iteratee: ResourceIteratee<T>,
-  ): Promise<void> {
-    const LIMIT = 100;
-    let page = 0;
-    let proceed = true;
-
-    do {
-      const response = await this.request<OrcaResponse<T[]>>(uri, 'POST', {
-        grouping: false,
-        start_at_index: page * LIMIT,
-        limit: LIMIT,
-      });
-
-      for (const item of response.data) {
-        await iteratee(item);
-      }
-
-      page++;
-      proceed = response.total_items > page * LIMIT;
-    } while (proceed);
-  }
-
-  /**
    * Iterates each user resource in the provider.
    *
    * @param iteratee receives each resource to produce entities/relationships
@@ -385,7 +355,7 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
-    await this.paginatedQuery('/query/cves', iteratee);
+    await this.iterateViaBulkDownload<OrcaCVE>(iteratee, '/query/cves');
   }
 
   public async iterateAlerts(
