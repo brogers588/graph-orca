@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.9.0 - 2022-08-05
+
+### Changed
+
+- Findings are now ingested ungrouped using the bulk download method.
+
 ## 1.8.0 - 2022-07-28
 
 ### Added
