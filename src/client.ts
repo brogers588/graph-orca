@@ -21,7 +21,6 @@ import {
   OrcaUser,
   OrcaAsset,
   OrcaCVE,
-  OrcaResponse,
   OrcaAsyncDownloadResponse,
   OrcaAsyncDownloadStatusResponse,
   OrcaAlert,
