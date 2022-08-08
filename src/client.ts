@@ -462,7 +462,7 @@ export class APIClient {
 
     let totalIterations = 0;
     const sleepTimeMs = 5000; // 5 seconds
-    const maxSleepTimeMs = 900000; // 15mins
+    const maxSleepTimeMs = 1800000; // 30 minutes
 
     do {
       await sleep(sleepTimeMs);
