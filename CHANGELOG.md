@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.9.1 - 2022-08-08
+
+### Changed
+
+- Increasing timeout for bulk download API calls.
+
 ## 1.9.0 - 2022-08-05
 
 ### Changed
