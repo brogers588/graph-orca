@@ -354,7 +354,16 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateCVEs(iteratee: ResourceIteratee<OrcaCVE>): Promise<void> {
-    await this.iterateViaBulkDownload<OrcaCVE>(iteratee, '/query/cves');
+    await this.iterateViaBulkDownload<OrcaCVE>(iteratee, '/query/cves', {
+      dsl_filter: {
+        filter: [
+          {
+            field: 'severity',
+            excludes: ['informational'],
+          },
+        ],
+      },
+    });
   }
 
   public async iterateAlerts(
