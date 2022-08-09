@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.9.2 - 2022-08-09
+
+### Changed
+
+- Informational findings are no longer ingested.
+
 ## 1.9.1 - 2022-08-08
 
 ### Changed
