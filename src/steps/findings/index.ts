@@ -15,7 +15,6 @@ import {
 } from '../constants';
 import {
   createAccountFindingRelationship,
-  createAssetFindingRelationship,
   createFindingCveRelationship,
   createFindingEntity,
 } from './converter';
@@ -44,14 +43,6 @@ export async function fetchCVEs({
       // Finding -IS-> CVE (mapped)
       createFindingCveRelationship(findingEntity, cve),
     ]);
-
-    const assetEntity = await jobState.findEntity(cve.asset_unique_id);
-    if (assetEntity) {
-      // Asset -HAS-> Finding
-      await jobState.addRelationship(
-        createAssetFindingRelationship(assetEntity, findingEntity),
-      );
-    }
   });
 }
 
@@ -62,10 +53,9 @@ export const findingSteps: IntegrationStep<IntegrationConfig>[] = [
     entities: [Entities.FINDING],
     relationships: [
       Relationships.ACCOUNT_HAS_FINDING,
-      Relationships.ASSET_HAS_FINDING,
       MappedRelationships.FINDING_IS_CVE,
     ],
-    dependsOn: [Steps.ACCOUNT, Steps.ASSETS],
+    dependsOn: [Steps.ACCOUNT],
     executionHandler: fetchCVEs,
   },
 ];

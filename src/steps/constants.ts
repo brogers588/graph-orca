@@ -16,6 +16,7 @@ export const Steps = {
   ALERTS: 'fetch-alerts',
   GROUP_USER_RELATIONSHIPS: 'build-user-group-relationships',
   USER_ROLE_RELATIONSHIPS: 'build-user-role-relationships',
+  ASSET_HAS_FINDING_RELATIONSHIPS: 'build-asset-has-finding',
 };
 
 export const Entities: Record<
