@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+## 1.10.0 - 2022-08-11
+
+### Changed
+
+- Assets are no longer a dependency for Findings.
+- ENABLE_ASSET_AND_FINDING_INGESTION is now ENABLE_ASSET_INGESTION and only
+  controls Asset ingestion.
+
 ## 1.9.2 - 2022-08-09
 
 ### Changed
